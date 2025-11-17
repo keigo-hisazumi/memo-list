@@ -1,13 +1,19 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import MemoView from '../views/MemoView.vue'
+import MemoListView from '../views/MemoListView.vue'
+import MemoEditorView from '../views/MemoEditorView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
       path: '/',
-      name: 'memo',
-      component: MemoView,
+      name: 'memo-list',
+      component: MemoListView,
+    },
+    {
+      path: '/memo/:id',
+      name: 'memo-edit',
+      component: MemoEditorView,
     },
   ],
 })
