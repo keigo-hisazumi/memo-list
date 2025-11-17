@@ -10,6 +10,8 @@ name: Copilot Setup Steps
 jobs:
   setup:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
 
     steps:
       # 日本語フォントのインストール
