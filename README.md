@@ -3,6 +3,12 @@
 Vue.js + TypeScript + Capacitorで構築されたクロスプラットフォーム対応のメモアプリケーションです。
 iOS、Android、Webで動作します。
 
+## デモ
+
+🌐 **GitHub Pages**: https://keigo-hisazumi.github.io/memo-list/
+
+mainブランチへのプッシュ時に自動的にGitHub Pagesにデプロイされます。
+
 ## 機能
 
 - ✅ メモの作成、編集、削除
@@ -75,6 +81,23 @@ npm run preview
 # TypeScriptの型チェック
 npm run type-check
 ```
+
+## デプロイメント
+
+### GitHub Pages
+
+このプロジェクトは、mainブランチへのプッシュ時に自動的にGitHub Pagesにデプロイされます。
+
+デプロイプロセス：
+1. mainブランチへコードをプッシュ
+2. GitHub Actionsが自動的にビルドを実行
+3. ビルド成果物がGitHub Pagesにデプロイされる
+
+**公開URL**: https://keigo-hisazumi.github.io/memo-list/
+
+**注意**: 初回デプロイ時は、GitHubリポジトリの設定でGitHub Pagesを有効にする必要があります：
+1. リポジトリの「Settings」→「Pages」を開く
+2. Sourceで「GitHub Actions」を選択
 
 ## モバイルアプリのビルド
 
