@@ -22,14 +22,16 @@ jobs:
             fonts-noto-cjk \
             fonts-noto-cjk-extra \
             fonts-ipafont \
-            fonts-ipaexfont
+            fonts-ipaexfont \
+            fonts-takao-gothic \
+            fonts-takao-mincho
 
           # フォントキャッシュの更新
           fc-cache -fv
 
           # インストールされた日本語フォントの確認
           echo "=== Installed Japanese fonts ==="
-          fc-list :lang=ja
+          fc-list :lang=ja family | sort -u
 
       # Node.js環境のセットアップ
       - name: Setup Node.js
