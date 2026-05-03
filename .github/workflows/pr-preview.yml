@@ -1,0 +1,116 @@
+name: PR Preview
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, closed]
+    branches: [main]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: pr-preview-${{ github.event.number }}
+  cancel-in-progress: true
+
+jobs:
+  deploy-preview:
+    if: github.event.action != 'closed'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build with PR-specific base path
+        env:
+          VITE_BASE_PATH: /memo-list/pr-${{ github.event.number }}/
+        run: npm run build
+
+      - name: Deploy PR preview to gh-pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
+          destination_dir: pr-${{ github.event.number }}
+          keep_files: true
+
+      - name: Post preview URL comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const prNumber = context.issue.number;
+            const previewUrl = `https://keigo-hisazumi.github.io/memo-list/pr-${prNumber}/`;
+            const marker = '<!-- pr-preview -->';
+            const body = [
+              marker,
+              '## プレビュー環境 🚀',
+              '',
+              `| | |`,
+              `|---|---|`,
+              `| **プレビューURL** | [${previewUrl}](${previewUrl}) |`,
+              `| **コミット** | \`${context.sha.slice(0, 7)}\` |`,
+              '',
+              '*コードをプッシュするたびに自動更新されます。*',
+            ].join('\n');
+
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+            });
+
+            const existing = comments.find(c => c.body.includes(marker));
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: prNumber,
+                body,
+              });
+            }
+
+  cleanup-preview:
+    if: github.event.action == 'closed'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Remove preview directory from gh-pages
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          if ! git ls-remote --exit-code origin gh-pages; then
+            echo "gh-pages branch does not exist, skipping cleanup"
+            exit 0
+          fi
+
+          git fetch origin gh-pages
+          git checkout gh-pages
+
+          if [ -d "pr-${{ github.event.number }}" ]; then
+            git rm -rf "pr-${{ github.event.number }}"
+            git commit -m "chore: remove PR #${{ github.event.number }} preview"
+            git push origin gh-pages
+          else
+            echo "Preview directory pr-${{ github.event.number }} not found, skipping"
+          fi
