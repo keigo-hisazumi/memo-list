@@ -1,23 +1,31 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
+import {
+  collection,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  doc,
+  onSnapshot,
+  query,
+  orderBy,
+  Timestamp,
+  type Unsubscribe
+} from 'firebase/firestore'
+import { db } from '@/firebase'
 import type { Memo, CreateMemoInput, UpdateMemoInput } from '@/types/memo'
 
-/**
- * メモストア
- * メモの CRUD 操作を管理
- */
 export const useMemoStore = defineStore('memo', () => {
-  // State
   const memos = ref<Memo[]>([])
   const selectedMemoId = ref<string | null>(null)
+  let unsubscribe: Unsubscribe | null = null
 
-  // Getters
-  const selectedMemo = computed(() => 
+  const selectedMemo = computed(() =>
     memos.value.find(memo => memo.id === selectedMemoId.value) || null
   )
 
-  const sortedMemos = computed(() => 
-    [...memos.value].sort((a, b) => 
+  const sortedMemos = computed(() =>
+    [...memos.value].sort((a, b) =>
       b.updatedAt.getTime() - a.updatedAt.getTime()
     )
   )
@@ -25,57 +33,77 @@ export const useMemoStore = defineStore('memo', () => {
   const categories = computed(() => {
     const categorySet = new Set<string>()
     memos.value.forEach(memo => {
-      if (memo.category) {
-        categorySet.add(memo.category)
-      }
+      if (memo.category) categorySet.add(memo.category)
     })
     return Array.from(categorySet).sort()
   })
 
-  // Actions
-  function generateId(): string {
-    return `memo_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+  function memosRef(userId: string) {
+    return collection(db, 'users', userId, 'memos')
   }
 
-  function createMemo(input: CreateMemoInput): Memo {
-    const now = new Date()
-    const newMemo: Memo = {
-      id: generateId(),
+  function subscribeToMemos(userId: string) {
+    if (unsubscribe) unsubscribe()
+
+    const q = query(memosRef(userId), orderBy('updatedAt', 'desc'))
+    unsubscribe = onSnapshot(q, (snapshot) => {
+      memos.value = snapshot.docs.map(d => {
+        const data = d.data()
+        return {
+          id: d.id,
+          title: data.title ?? '',
+          content: data.content ?? '',
+          category: data.category,
+          createdAt: (data.createdAt as Timestamp).toDate(),
+          updatedAt: (data.updatedAt as Timestamp).toDate()
+        }
+      })
+    })
+  }
+
+  function unsubscribeFromMemos() {
+    if (unsubscribe) {
+      unsubscribe()
+      unsubscribe = null
+    }
+    memos.value = []
+    selectedMemoId.value = null
+  }
+
+  async function createMemo(userId: string, input: CreateMemoInput): Promise<Memo> {
+    const now = Timestamp.now()
+    const docRef = await addDoc(memosRef(userId), {
+      title: input.title,
+      content: input.content,
+      category: input.category ?? null,
+      createdAt: now,
+      updatedAt: now
+    })
+    const memo: Memo = {
+      id: docRef.id,
       title: input.title,
       content: input.content,
       category: input.category,
-      createdAt: now,
-      updatedAt: now
+      createdAt: now.toDate(),
+      updatedAt: now.toDate()
     }
-    memos.value.push(newMemo)
-    return newMemo
+    return memo
   }
 
-  function updateMemo(id: string, input: UpdateMemoInput): boolean {
-    const index = memos.value.findIndex(memo => memo.id === id)
-    if (index === -1) return false
-
-    const currentMemo = memos.value[index]!
-    memos.value[index] = {
-      id: currentMemo.id,
-      title: input.title !== undefined ? input.title : currentMemo.title,
-      content: input.content !== undefined ? input.content : currentMemo.content,
-      category: input.category !== undefined ? input.category : currentMemo.category,
-      createdAt: currentMemo.createdAt,
-      updatedAt: new Date()
-    }
-    return true
+  async function updateMemo(userId: string, id: string, input: UpdateMemoInput): Promise<void> {
+    const ref = doc(db, 'users', userId, 'memos', id)
+    await updateDoc(ref, {
+      ...input,
+      updatedAt: Timestamp.now()
+    })
   }
 
-  function deleteMemo(id: string): boolean {
-    const index = memos.value.findIndex(memo => memo.id === id)
-    if (index === -1) return false
-
-    memos.value.splice(index, 1)
+  async function deleteMemo(userId: string, id: string): Promise<void> {
+    const ref = doc(db, 'users', userId, 'memos', id)
+    await deleteDoc(ref)
     if (selectedMemoId.value === id) {
       selectedMemoId.value = null
     }
-    return true
   }
 
   function selectMemo(id: string | null) {
@@ -92,64 +120,26 @@ export const useMemoStore = defineStore('memo', () => {
 
   function searchMemos(query: string): Memo[] {
     const lowerQuery = query.toLowerCase()
-    return memos.value.filter(memo => 
+    return memos.value.filter(memo =>
       memo.title.toLowerCase().includes(lowerQuery) ||
       memo.content.toLowerCase().includes(lowerQuery)
     )
   }
 
-  // モックデータの初期化
-  function initializeMockData() {
-    const mockMemos: CreateMemoInput[] = [
-      {
-        title: '買い物リスト',
-        content: '- 牛乳\n- 卵\n- パン\n- りんご',
-        category: '日常'
-      },
-      {
-        title: 'プロジェクトのアイデア',
-        content: 'Vue.js + TypeScriptでメモアプリを作成する。\nCapacitorでクロスプラットフォーム対応。',
-        category: '仕事'
-      },
-      {
-        title: '読書メモ',
-        content: '「Clean Code」の第3章まで読了。\n関数は小さく保つことが重要。',
-        category: '学習'
-      },
-      {
-        title: '旅行の計画',
-        content: '週末：京都\n- 清水寺\n- 金閣寺\n- 伏見稲荷大社',
-        category: '趣味'
-      },
-      {
-        title: 'ミーティングメモ',
-        content: '2024-11-13 プロジェクトキックオフ\n- スケジュール確認\n- タスク割り当て\n- 次回: 11/20',
-        category: '仕事'
-      }
-    ]
-
-    // 既存のメモがある場合は初期化しない
-    if (memos.value.length === 0) {
-      mockMemos.forEach(memo => createMemo(memo))
-    }
-  }
-
   return {
-    // State
     memos,
     selectedMemoId,
-    // Getters
     selectedMemo,
     sortedMemos,
     categories,
-    // Actions
+    subscribeToMemos,
+    unsubscribeFromMemos,
     createMemo,
     updateMemo,
     deleteMemo,
     selectMemo,
     getMemoById,
     filterByCategory,
-    searchMemos,
-    initializeMockData
+    searchMemos
   }
 })
