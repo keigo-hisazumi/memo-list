@@ -5,6 +5,7 @@ import {
   addDoc,
   updateDoc,
   deleteDoc,
+  deleteField,
   doc,
   onSnapshot,
   query,
@@ -92,10 +93,13 @@ export const useMemoStore = defineStore('memo', () => {
 
   async function updateMemo(userId: string, id: string, input: UpdateMemoInput): Promise<void> {
     const ref = doc(db, 'users', userId, 'memos', id)
-    await updateDoc(ref, {
-      ...input,
-      updatedAt: Timestamp.now()
-    })
+    const data: Record<string, unknown> = { updatedAt: Timestamp.now() }
+    if (input.title !== undefined) data.title = input.title
+    if (input.content !== undefined) data.content = input.content
+    if ('category' in input) {
+      data.category = input.category !== undefined ? input.category : deleteField()
+    }
+    await updateDoc(ref, data)
   }
 
   async function deleteMemo(userId: string, id: string): Promise<void> {
