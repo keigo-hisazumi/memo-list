@@ -14,7 +14,6 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useMemoStore } from '@/stores/memo'
 import { useAuthStore } from '@/stores/auth'
@@ -23,16 +22,6 @@ import MemoList from '@/components/MemoList.vue'
 const router = useRouter()
 const memoStore = useMemoStore()
 const authStore = useAuthStore()
-
-onMounted(() => {
-  if (authStore.currentUser) {
-    memoStore.subscribeToMemos(authStore.currentUser.uid)
-  }
-})
-
-onUnmounted(() => {
-  memoStore.unsubscribeFromMemos()
-})
 
 function handleSelectMemo(id: string) {
   router.push({ name: 'memo-edit', params: { id } })
@@ -48,7 +37,6 @@ async function handleCreateMemo() {
 }
 
 async function handleLogout() {
-  memoStore.unsubscribeFromMemos()
   await authStore.logout()
   router.push({ name: 'login' })
 }

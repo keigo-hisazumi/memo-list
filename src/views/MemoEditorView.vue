@@ -29,22 +29,11 @@ const memoStore = useMemoStore()
 const authStore = useAuthStore()
 
 onMounted(() => {
-  const memoId = route.params.id as string
-  if (memoId) {
-    memoStore.selectMemo(memoId)
-  }
+  memoStore.selectMemo(route.params.id as string)
 })
 
 watch(() => route.params.id, (newId) => {
-  if (newId) {
-    memoStore.selectMemo(newId as string)
-  }
-})
-
-watch(() => memoStore.selectedMemo, (memo) => {
-  if (!memo && memoStore.memos.length > 0) {
-    router.push({ name: 'memo-list' })
-  }
+  if (newId) memoStore.selectMemo(newId as string)
 })
 
 function handleBack() {
