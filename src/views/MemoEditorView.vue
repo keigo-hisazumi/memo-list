@@ -20,50 +20,34 @@
 import { onMounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useMemoStore } from '@/stores/memo'
+import { useAuthStore } from '@/stores/auth'
 import MemoEditor from '@/components/MemoEditor.vue'
 
 const router = useRouter()
 const route = useRoute()
 const memoStore = useMemoStore()
+const authStore = useAuthStore()
 
 onMounted(() => {
-  // モックデータの初期化
-  memoStore.initializeMockData()
-  
-  // URLパラメータからメモIDを取得して選択
-  const memoId = route.params.id as string
-  if (memoId) {
-    memoStore.selectMemo(memoId)
-    
-    // メモが存在しない場合は一覧に戻る
-    if (!memoStore.selectedMemo) {
-      router.push({ name: 'memo-list' })
-    }
-  }
+  memoStore.selectMemo(route.params.id as string)
 })
 
-// ルートパラメータが変更されたときにメモを選択し直す
 watch(() => route.params.id, (newId) => {
-  if (newId) {
-    memoStore.selectMemo(newId as string)
-    
-    // メモが存在しない場合は一覧に戻る
-    if (!memoStore.selectedMemo) {
-      router.push({ name: 'memo-list' })
-    }
-  }
+  if (newId) memoStore.selectMemo(newId as string)
 })
 
 function handleBack() {
   router.push({ name: 'memo-list' })
 }
 
-function handleUpdateMemo(id: string, data: { title?: string; content?: string; category?: string }) {
-  memoStore.updateMemo(id, data)
+async function handleUpdateMemo(id: string, data: { title?: string; content?: string; category?: string }) {
+  if (!authStore.currentUser) return
+  await memoStore.updateMemo(authStore.currentUser.uid, id, data)
 }
 
-function handleDeleteMemo(id: string) {
-  memoStore.deleteMemo(id)
+async function handleDeleteMemo(id: string) {
+  if (!authStore.currentUser) return
+  await memoStore.deleteMemo(authStore.currentUser.uid, id)
   router.push({ name: 'memo-list' })
 }
 </script>

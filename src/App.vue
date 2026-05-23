@@ -1,5 +1,23 @@
 <script setup lang="ts">
+import { watch } from 'vue'
 import { RouterView } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
+import { useMemoStore } from '@/stores/memo'
+
+const authStore = useAuthStore()
+const memoStore = useMemoStore()
+
+watch(
+  () => authStore.currentUser,
+  (user) => {
+    if (user) {
+      memoStore.subscribeToMemos(user.uid)
+    } else {
+      memoStore.unsubscribeFromMemos()
+    }
+  },
+  { immediate: true }
+)
 </script>
 
 <template>
