@@ -15,9 +15,12 @@ const app = createApp(App)
 const pinia = createPinia()
 
 app.use(pinia)
-app.use(router)
 
+// Firebase の認証状態が確定してからルーターをマウントすることで、
+// ページリロード時に onAuthStateChanged が完了する前にルートガードが
+// 走って currentUser が null と判定されるレースコンディションを防ぐ
 const authStore = useAuthStore()
 authStore.initAuth().then(() => {
+  app.use(router)
   app.mount('#app')
 })
