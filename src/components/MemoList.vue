@@ -4,35 +4,37 @@
       <h2>メモ一覧</h2>
     </div>
 
-    <div v-if="memos.length === 0" class="empty-state">
-      <p>メモがありません</p>
-      <p class="empty-hint">右下のボタンでメモを追加しましょう</p>
-    </div>
+    <div class="memo-list-body">
+      <div v-if="memos.length === 0" class="empty-state">
+        <p>メモがありません</p>
+        <p class="empty-hint">右下のボタンでメモを追加しましょう</p>
+      </div>
 
-    <div v-else class="memo-items">
-      <div
-        v-for="memo in memos"
-        :key="memo.id"
-        :class="['memo-item', { active: selectedId === memo.id }]"
-        @click="$emit('select', memo.id)"
-      >
-        <div class="memo-item-header">
-          <h3 class="memo-title">{{ memo.title || '無題のメモ' }}</h3>
-          <span v-if="memo.category" class="memo-category">{{ memo.category }}</span>
-        </div>
-        <p class="memo-preview">{{ getPreview(memo.content) }}</p>
-        <div class="memo-meta">
-          <span class="memo-date">{{ formatDate(memo.updatedAt) }}</span>
+      <div v-else class="memo-items">
+        <div
+          v-for="memo in memos"
+          :key="memo.id"
+          :class="['memo-item', { active: selectedId === memo.id }]"
+          @click="$emit('select', memo.id)"
+        >
+          <div class="memo-item-header">
+            <h3 class="memo-title">{{ memo.title || '無題のメモ' }}</h3>
+            <span v-if="memo.category" class="memo-category">{{ memo.category }}</span>
+          </div>
+          <p class="memo-preview">{{ getPreview(memo.content) }}</p>
+          <div class="memo-meta">
+            <span class="memo-date">{{ formatDate(memo.updatedAt) }}</span>
+          </div>
         </div>
       </div>
-    </div>
 
-    <button @click="$emit('create')" class="fab-create" aria-label="新規作成">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-        <line x1="12" y1="5" x2="12" y2="19" />
-        <line x1="5" y1="12" x2="19" y2="12" />
-      </svg>
-    </button>
+      <button @click="$emit('create')" class="fab-create" aria-label="新規作成">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="12" y1="5" x2="12" y2="19" />
+          <line x1="5" y1="12" x2="19" y2="12" />
+        </svg>
+      </button>
+    </div>
   </div>
 </template>
 
@@ -84,7 +86,13 @@ function formatDate(date: Date): string {
   height: 100%;
   background: var(--app-bg-soft);
   transition: background 0.3s;
+}
+
+.memo-list-body {
+  flex: 1;
   position: relative;
+  overflow: hidden;
+  min-height: 0;
 }
 
 .memo-list-header {
@@ -155,9 +163,10 @@ function formatDate(date: Date): string {
 }
 
 .memo-items {
-  flex: 1;
+  height: 100%;
   overflow-y: auto;
   padding: 0.5rem;
+  padding-bottom: 5rem;
 }
 
 .memo-item {
