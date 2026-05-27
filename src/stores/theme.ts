@@ -18,7 +18,7 @@ export const useThemeStore = defineStore('theme', () => {
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
       if (!localStorage.getItem('theme')) {
         isDark.value = e.matches
-        applyTheme()
+        applyThemeWithTransition()
       }
     })
   }
@@ -26,7 +26,16 @@ export const useThemeStore = defineStore('theme', () => {
   function toggleTheme() {
     isDark.value = !isDark.value
     localStorage.setItem('theme', isDark.value ? 'dark' : 'light')
+    applyThemeWithTransition()
+  }
+
+  function applyThemeWithTransition() {
+    // 全要素に一時的なトランジションクラスを付与して滑らかに切り替える
+    document.documentElement.classList.add('theme-transitioning')
     applyTheme()
+    setTimeout(() => {
+      document.documentElement.classList.remove('theme-transitioning')
+    }, 400)
   }
 
   function applyTheme() {
