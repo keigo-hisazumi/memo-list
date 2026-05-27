@@ -2,14 +2,11 @@
   <div class="memo-list">
     <div class="memo-list-header">
       <h2>メモ一覧</h2>
-      <button @click="$emit('create')" class="btn-create">
-        <span>+</span> 新規作成
-      </button>
     </div>
 
     <div v-if="memos.length === 0" class="empty-state">
       <p>メモがありません</p>
-      <p class="empty-hint">「新規作成」ボタンでメモを追加しましょう</p>
+      <p class="empty-hint">右下のボタンでメモを追加しましょう</p>
     </div>
 
     <div v-else class="memo-items">
@@ -29,6 +26,13 @@
         </div>
       </div>
     </div>
+
+    <button @click="$emit('create')" class="fab-create" aria-label="新規作成">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="12" y1="5" x2="12" y2="19" />
+        <line x1="5" y1="12" x2="19" y2="12" />
+      </svg>
+    </button>
   </div>
 </template>
 
@@ -80,6 +84,7 @@ function formatDate(date: Date): string {
   height: 100%;
   background: var(--app-bg-soft);
   transition: background 0.3s;
+  position: relative;
 }
 
 .memo-list-header {
@@ -100,28 +105,38 @@ function formatDate(date: Date): string {
   transition: color 0.3s;
 }
 
-.btn-create {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 1rem;
+.fab-create {
+  position: absolute;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
   background: var(--app-accent);
   color: white;
   border: none;
-  border-radius: 6px;
-  font-size: 0.9rem;
-  font-weight: 500;
   cursor: pointer;
-  transition: background 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.45);
+  transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+  z-index: 10;
 }
 
-.btn-create:hover {
+.fab-create svg {
+  width: 26px;
+  height: 26px;
+}
+
+.fab-create:hover {
   background: var(--app-accent-hover);
+  transform: scale(1.08);
+  box-shadow: 0 6px 18px rgba(102, 126, 234, 0.55);
 }
 
-.btn-create span {
-  font-size: 1.2rem;
-  font-weight: bold;
+.fab-create:active {
+  transform: scale(0.95);
 }
 
 .empty-state {
