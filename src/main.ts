@@ -6,6 +6,10 @@ import { createPinia } from 'pinia'
 import App from './App.vue'
 import router from './router'
 import { useAuthStore } from './stores/auth'
+import { registerSW } from 'virtual:pwa-register'
+
+// Service Worker を自動更新モードで登録
+registerSW({ immediate: true })
 
 const app = createApp(App)
 const pinia = createPinia()
