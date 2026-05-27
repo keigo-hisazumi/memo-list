@@ -1,9 +1,5 @@
 <template>
   <div class="memo-list">
-    <div class="memo-list-header">
-      <h2>メモ一覧</h2>
-    </div>
-
     <div class="memo-list-body">
       <div v-if="memos.length === 0" class="empty-state">
         <p>メモがありません</p>
@@ -93,24 +89,6 @@ function formatDate(date: Date): string {
   position: relative;
   overflow: hidden;
   min-height: 0;
-}
-
-.memo-list-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem 1.5rem;
-  background: var(--app-bg);
-  border-bottom: 1px solid var(--app-border);
-  transition: background 0.3s, border-color 0.3s;
-}
-
-.memo-list-header h2 {
-  margin: 0;
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: var(--app-text);
-  transition: color 0.3s;
 }
 
 .fab-create {

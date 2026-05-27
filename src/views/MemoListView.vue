@@ -49,6 +49,8 @@ async function handleLogout() {
   flex-direction: column;
   height: 100vh;
   overflow: hidden;
+  max-width: 600px;
+  margin: 0 auto;
 }
 
 .list-header-bar {
