@@ -99,11 +99,7 @@ function closeMenu() {
 }
 
 function handleThemeToggle() {
-  // メニューを閉じてからテーマを切り替え（閉じるアニメーション完了後に変更）
-  closeMenu()
-  setTimeout(() => {
-    themeStore.toggleTheme()
-  }, 180)
+  themeStore.toggleTheme()
 }
 
 function handleLogout() {
