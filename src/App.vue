@@ -1,11 +1,17 @@
 <script setup lang="ts">
-import { watch } from 'vue'
+import { watch, onMounted } from 'vue'
 import { RouterView } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useMemoStore } from '@/stores/memo'
+import { useThemeStore } from '@/stores/theme'
 
 const authStore = useAuthStore()
 const memoStore = useMemoStore()
+const themeStore = useThemeStore()
+
+onMounted(() => {
+  themeStore.initTheme()
+})
 
 watch(
   () => authStore.currentUser,

@@ -1,8 +1,8 @@
 <template>
   <div class="memo-list-view">
     <div class="list-header-bar">
-      <span class="user-email">{{ authStore.currentUser?.email }}</span>
-      <button @click="handleLogout" class="btn-logout">ログアウト</button>
+      <span class="app-title">メモ帳</span>
+      <HamburgerMenu @logout="handleLogout" />
     </div>
     <MemoList
       :memos="memoStore.sortedMemos"
@@ -18,6 +18,7 @@ import { useRouter } from 'vue-router'
 import { useMemoStore } from '@/stores/memo'
 import { useAuthStore } from '@/stores/auth'
 import MemoList from '@/components/MemoList.vue'
+import HamburgerMenu from '@/components/HamburgerMenu.vue'
 
 const router = useRouter()
 const memoStore = useMemoStore()
@@ -54,33 +55,16 @@ async function handleLogout() {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.5rem 1.5rem;
-  background: #f0fdf7;
-  border-bottom: 1px solid #d1fae5;
+  padding: 0.5rem 1rem 0.5rem 1.5rem;
+  background: var(--app-header-bg);
+  border-bottom: 1px solid var(--app-header-border);
+  transition: background 0.3s, border-color 0.3s;
 }
 
-.user-email {
-  font-size: 0.8rem;
-  color: #666;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.btn-logout {
-  padding: 0.35rem 0.85rem;
-  background: transparent;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  font-size: 0.8rem;
-  color: #666;
-  cursor: pointer;
-  transition: all 0.2s;
-  white-space: nowrap;
-}
-
-.btn-logout:hover {
-  border-color: #e53935;
-  color: #e53935;
+.app-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--app-accent);
+  letter-spacing: 0.02em;
 }
 </style>
