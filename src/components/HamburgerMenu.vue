@@ -204,6 +204,20 @@ onUnmounted(() => {
   padding: 1rem 1.25rem;
   cursor: default;
   pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.account-name {
+  font-size: 0.85rem;
+  color: var(--app-text);
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 180px;
+  text-decoration: none;
 }
 
 .account-avatar {
@@ -219,15 +233,6 @@ onUnmounted(() => {
   flex-shrink: 0;
 }
 
-.account-name {
-  font-size: 0.85rem;
-  color: var(--app-text);
-  font-weight: 500;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  max-width: 180px;
-}
 
 /* 区切り線 */
 .menu-divider {
