@@ -218,6 +218,7 @@ onUnmounted(() => {
   white-space: nowrap;
   max-width: 180px;
   text-decoration: none;
+  -webkit-touch-callout: none;
 }
 
 .account-avatar {
