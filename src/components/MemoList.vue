@@ -64,7 +64,7 @@ function formatDate(date: Date): string {
   if (minutes < 60) return `${minutes}分前`
   if (hours < 24) return `${hours}時間前`
   if (days < 7) return `${days}日前`
-  
+
   return date.toLocaleDateString('ja-JP', {
     year: 'numeric',
     month: '2-digit',
@@ -78,7 +78,8 @@ function formatDate(date: Date): string {
   display: flex;
   flex-direction: column;
   height: 100%;
-  background: #f5f5f5;
+  background: var(--app-bg-soft);
+  transition: background 0.3s;
 }
 
 .memo-list-header {
@@ -86,15 +87,17 @@ function formatDate(date: Date): string {
   justify-content: space-between;
   align-items: center;
   padding: 1rem 1.5rem;
-  background: white;
-  border-bottom: 1px solid #e0e0e0;
+  background: var(--app-bg);
+  border-bottom: 1px solid var(--app-border);
+  transition: background 0.3s, border-color 0.3s;
 }
 
 .memo-list-header h2 {
   margin: 0;
   font-size: 1.25rem;
   font-weight: 600;
-  color: #333;
+  color: var(--app-text);
+  transition: color 0.3s;
 }
 
 .btn-create {
@@ -102,7 +105,7 @@ function formatDate(date: Date): string {
   align-items: center;
   gap: 0.5rem;
   padding: 0.5rem 1rem;
-  background: #42b883;
+  background: var(--app-accent);
   color: white;
   border: none;
   border-radius: 6px;
@@ -113,7 +116,7 @@ function formatDate(date: Date): string {
 }
 
 .btn-create:hover {
-  background: #359268;
+  background: var(--app-accent-hover);
 }
 
 .btn-create span {
@@ -124,7 +127,8 @@ function formatDate(date: Date): string {
 .empty-state {
   padding: 3rem 1.5rem;
   text-align: center;
-  color: #999;
+  color: var(--app-text-muted);
+  transition: color 0.3s;
 }
 
 .empty-state p {
@@ -142,7 +146,7 @@ function formatDate(date: Date): string {
 }
 
 .memo-item {
-  background: white;
+  background: var(--app-bg);
   padding: 1rem 1.5rem;
   margin-bottom: 0.5rem;
   border-radius: 8px;
@@ -152,12 +156,12 @@ function formatDate(date: Date): string {
 }
 
 .memo-item:hover {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px var(--app-shadow);
 }
 
 .memo-item.active {
-  border-color: #42b883;
-  background: #f0fdf7;
+  border-color: var(--app-active-border);
+  background: var(--app-active-bg);
 }
 
 .memo-item-header {
@@ -172,31 +176,34 @@ function formatDate(date: Date): string {
   margin: 0;
   font-size: 1rem;
   font-weight: 600;
-  color: #333;
+  color: var(--app-text);
   flex: 1;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  transition: color 0.3s;
 }
 
 .memo-category {
   padding: 0.25rem 0.75rem;
-  background: #e3f2fd;
-  color: #1976d2;
+  background: var(--app-category-bg);
+  color: var(--app-category-text);
   border-radius: 12px;
   font-size: 0.75rem;
   font-weight: 500;
   white-space: nowrap;
+  transition: background 0.3s, color 0.3s;
 }
 
 .memo-preview {
   margin: 0 0 0.5rem;
   font-size: 0.875rem;
-  color: #666;
+  color: var(--app-text-secondary);
   line-height: 1.4;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  transition: color 0.3s;
 }
 
 .memo-meta {
@@ -206,6 +213,7 @@ function formatDate(date: Date): string {
 
 .memo-date {
   font-size: 0.75rem;
-  color: #999;
+  color: var(--app-text-muted);
+  transition: color 0.3s;
 }
 </style>

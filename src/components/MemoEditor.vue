@@ -40,7 +40,7 @@
           @input="handleUpdate"
         />
         <span class="meta-date">
-          作成: {{ formatDate(memo.createdAt) }} / 
+          作成: {{ formatDate(memo.createdAt) }} /
           更新: {{ formatDate(memo.updatedAt) }}
         </span>
       </div>
@@ -91,7 +91,7 @@ watch(() => props.memo, (newMemo) => {
 
 function handleUpdate() {
   if (!props.memo) return
-  
+
   emit('update', props.memo.id, {
     title: localTitle.value,
     content: localContent.value,
@@ -101,7 +101,7 @@ function handleUpdate() {
 
 function handleDelete() {
   if (!props.memo) return
-  
+
   if (confirm(`「${props.memo.title || '無題のメモ'}」を削除してもよろしいですか？`)) {
     emit('delete', props.memo.id)
   }
@@ -123,7 +123,8 @@ function formatDate(date: Date): string {
   display: flex;
   flex-direction: column;
   height: 100%;
-  background: white;
+  background: var(--app-bg);
+  transition: background 0.3s;
 }
 
 .no-selection {
@@ -131,7 +132,8 @@ function formatDate(date: Date): string {
   align-items: center;
   justify-content: center;
   height: 100%;
-  color: #999;
+  color: var(--app-text-muted);
+  transition: color 0.3s;
 }
 
 .no-selection-content {
@@ -159,7 +161,8 @@ function formatDate(date: Date): string {
   align-items: center;
   gap: 1rem;
   padding: 1.5rem 1.5rem 0.5rem;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid var(--app-border);
+  transition: border-color 0.3s;
 }
 
 .title-input {
@@ -169,11 +172,13 @@ function formatDate(date: Date): string {
   border: none;
   outline: none;
   padding: 0.5rem;
-  color: #333;
+  color: var(--app-text);
+  background: transparent;
+  transition: color 0.3s;
 }
 
 .title-input::placeholder {
-  color: #ccc;
+  color: var(--app-text-placeholder);
 }
 
 .editor-actions {
@@ -187,13 +192,13 @@ function formatDate(date: Date): string {
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  color: #666;
+  color: var(--app-text-muted);
   transition: all 0.2s;
 }
 
 .btn-delete:hover {
-  background: #fee;
-  color: #d32f2f;
+  background: var(--app-delete-hover-bg);
+  color: var(--app-delete-hover-text);
 }
 
 .editor-meta {
@@ -201,25 +206,34 @@ function formatDate(date: Date): string {
   align-items: center;
   gap: 1rem;
   padding: 0.5rem 1.5rem;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid var(--app-border);
+  transition: border-color 0.3s;
 }
 
 .category-input {
   padding: 0.25rem 0.75rem;
-  border: 1px solid #e0e0e0;
+  border: 1px solid var(--app-border);
   border-radius: 12px;
   font-size: 0.875rem;
   outline: none;
   max-width: 200px;
+  background: var(--app-input-bg);
+  color: var(--app-text);
+  transition: background 0.3s, border-color 0.3s, color 0.3s;
 }
 
 .category-input:focus {
-  border-color: #42b883;
+  border-color: var(--app-accent);
+}
+
+.category-input::placeholder {
+  color: var(--app-text-placeholder);
 }
 
 .meta-date {
   font-size: 0.75rem;
-  color: #999;
+  color: var(--app-text-muted);
+  transition: color 0.3s;
 }
 
 .editor-content {
@@ -237,10 +251,12 @@ function formatDate(date: Date): string {
   font-family: inherit;
   line-height: 1.6;
   resize: none;
-  color: #333;
+  color: var(--app-text);
+  background: transparent;
+  transition: color 0.3s;
 }
 
 .content-textarea::placeholder {
-  color: #ccc;
+  color: var(--app-text-placeholder);
 }
 </style>
