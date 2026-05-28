@@ -1,9 +1,5 @@
 <template>
   <div class="memo-list">
-    <div class="memo-list-header">
-      <h2>メモ一覧</h2>
-    </div>
-
     <div class="memo-list-body">
       <div v-if="memos.length === 0" class="empty-state">
         <p>メモがありません</p>
@@ -81,42 +77,22 @@ function formatDate(date: Date): string {
 
 <style scoped>
 .memo-list {
+  flex: 1;
   display: flex;
   flex-direction: column;
-  height: 100%;
   background: var(--app-bg-soft);
   transition: background 0.3s;
 }
 
 .memo-list-body {
-  flex: 1;
   position: relative;
-  overflow: hidden;
-  min-height: 0;
-}
-
-.memo-list-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem 1.5rem;
-  background: var(--app-bg);
-  border-bottom: 1px solid var(--app-border);
-  transition: background 0.3s, border-color 0.3s;
-}
-
-.memo-list-header h2 {
-  margin: 0;
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: var(--app-text);
-  transition: color 0.3s;
+  padding-bottom: 5rem;
 }
 
 .fab-create {
-  position: absolute;
-  bottom: 1.5rem;
-  right: 1.5rem;
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
   width: 56px;
   height: 56px;
   border-radius: 50%;
@@ -129,7 +105,7 @@ function formatDate(date: Date): string {
   justify-content: center;
   box-shadow: 0 4px 12px rgba(102, 126, 234, 0.45);
   transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
-  z-index: 10;
+  z-index: 20;
 }
 
 .fab-create svg {
@@ -163,10 +139,7 @@ function formatDate(date: Date): string {
 }
 
 .memo-items {
-  height: 100%;
-  overflow-y: auto;
   padding: 0.5rem;
-  padding-bottom: 5rem;
 }
 
 .memo-item {

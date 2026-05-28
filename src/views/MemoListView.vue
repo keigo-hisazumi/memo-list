@@ -47,11 +47,17 @@ async function handleLogout() {
 .memo-list-view {
   display: flex;
   flex-direction: column;
-  height: 100vh;
-  overflow: hidden;
+  min-height: 100vh;
+  max-width: 600px;
+  margin: 0 auto;
+  background: var(--app-bg-soft);
+  transition: background 0.3s;
 }
 
 .list-header-bar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -59,6 +65,7 @@ async function handleLogout() {
   background: var(--app-header-bg);
   border-bottom: 1px solid var(--app-header-border);
   transition: background 0.3s, border-color 0.3s;
+  box-shadow: 0 1px 4px var(--app-shadow);
 }
 
 .app-title {

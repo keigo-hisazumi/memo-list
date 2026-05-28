@@ -58,13 +58,17 @@ async function handleDeleteMemo(id: string) {
   flex-direction: column;
   height: 100vh;
   overflow: hidden;
-  background: white;
+  background: var(--app-bg);
+  transition: background 0.3s;
+  max-width: 600px;
+  margin: 0 auto;
 }
 
 .editor-header-nav {
   padding: 1rem 1.5rem;
-  border-bottom: 1px solid #e0e0e0;
-  background: white;
+  border-bottom: 1px solid var(--app-border);
+  background: var(--app-bg);
+  transition: background 0.3s, border-color 0.3s;
 }
 
 .btn-back {
@@ -73,19 +77,19 @@ async function handleDeleteMemo(id: string) {
   gap: 0.5rem;
   padding: 0.5rem 1rem;
   background: transparent;
-  border: 1px solid #e0e0e0;
+  border: 1px solid var(--app-border);
   border-radius: 6px;
   font-size: 0.9rem;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
-  color: #666;
+  color: var(--app-text-secondary);
 }
 
 .btn-back:hover {
-  background: #f5f5f5;
-  border-color: #42b883;
-  color: #42b883;
+  background: var(--app-bg-soft);
+  border-color: var(--app-accent);
+  color: var(--app-accent);
 }
 
 .btn-back svg {
