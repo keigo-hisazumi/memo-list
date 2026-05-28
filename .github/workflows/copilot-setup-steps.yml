@@ -1,11 +1,13 @@
----
 name: Copilot Setup Steps
 
-# このワークフローはCopilot coding agentのビルド環境で実行される
-# スクリーンショット撮影時に日本語フォントが正しく表示されるように設定
-
-'on':
-  workflow_dispatch: {}
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - .github/workflows/copilot-setup-steps.yml
+  pull_request:
+    paths:
+      - .github/workflows/copilot-setup-steps.yml
 
 jobs:
   copilot-setup-steps:
@@ -14,8 +16,10 @@ jobs:
       contents: read
 
     steps:
-      # 日本語フォントのインストール
-      - name: Install Japanese fonts
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: フォントのインストール
         run: |
           sudo apt-get update
           sudo apt-get install -y \
@@ -24,38 +28,41 @@ jobs:
             fonts-ipafont \
             fonts-ipaexfont \
             fonts-takao-gothic \
-            fonts-takao-mincho
-
-          # フォントキャッシュの更新
+            fonts-takao-mincho \
+            fonts-liberation \
+            fonts-dejavu \
+            fonts-ubuntu \
+            fonts-open-sans
+          echo "ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true" | sudo debconf-set-selections
+          sudo apt-get install -y ttf-mscorefonts-installer
+          sudo mkdir -p /usr/share/fonts/truetype/segoe-ui
+          cd /tmp
+          wget -q https://github.com/mrbvrz/segoe-ui-linux/raw/master/font/segoeui.ttf -O segoeui.ttf
+          wget -q https://github.com/mrbvrz/segoe-ui-linux/raw/master/font/segoeuib.ttf -O segoeuib.ttf
+          wget -q https://github.com/mrbvrz/segoe-ui-linux/raw/master/font/segoeuii.ttf -O segoeuii.ttf
+          wget -q https://github.com/mrbvrz/segoe-ui-linux/raw/master/font/segoeuiz.ttf -O segoeuiz.ttf
+          sudo mv *.ttf /usr/share/fonts/truetype/segoe-ui/
           fc-cache -fv
 
-          # インストールされた日本語フォントの確認
-          echo "=== Installed Japanese fonts ==="
-          fc-list :lang=ja family | sort -u
-
-      # Node.js環境のセットアップ
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '22'
-
-      # 依存関係のインストール
-      - name: Checkout repository
-        uses: actions/checkout@v4
+          cache: 'npm'
 
       - name: Install dependencies
         run: npm ci
 
-      # ビルドの実行
-      - name: Build application
-        run: npm run build
+      - name: 型チェック
+        run: npm run type-check
 
-      # 開発サーバーの起動（スクリーンショット撮影用）
-      - name: Start development server
+      - name: ビルド
+        run: npm run build-only
+
+      - name: 開発サーバーの起動
         run: npm run dev &
 
-      # サーバーの起動を待機
-      - name: Wait for server
+      - name: サーバーの起動待機
         run: |
           timeout 60 bash -c \
             'until curl -sf http://localhost:5173 > /dev/null; \
