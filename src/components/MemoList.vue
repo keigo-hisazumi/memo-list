@@ -93,8 +93,8 @@ function formatDate(date: Date): string {
 
 .fab-create {
   position: absolute;
-  bottom: 1.5rem;
-  right: 1.5rem;
+  bottom: 2rem;
+  right: 2rem;
   width: 56px;
   height: 56px;
   border-radius: 50%;
