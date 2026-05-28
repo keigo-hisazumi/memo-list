@@ -79,20 +79,17 @@ function formatDate(date: Date): string {
 .memo-list {
   display: flex;
   flex-direction: column;
-  height: 100%;
   background: var(--app-bg-soft);
   transition: background 0.3s;
 }
 
 .memo-list-body {
-  flex: 1;
   position: relative;
-  overflow: hidden;
-  min-height: 0;
+  padding-bottom: 5rem;
 }
 
 .fab-create {
-  position: absolute;
+  position: fixed;
   bottom: 2rem;
   right: 2rem;
   width: 56px;
@@ -107,7 +104,7 @@ function formatDate(date: Date): string {
   justify-content: center;
   box-shadow: 0 4px 12px rgba(102, 126, 234, 0.45);
   transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
-  z-index: 10;
+  z-index: 20;
 }
 
 .fab-create svg {
@@ -141,10 +138,7 @@ function formatDate(date: Date): string {
 }
 
 .memo-items {
-  height: 100%;
-  overflow-y: auto;
   padding: 0.5rem;
-  padding-bottom: 5rem;
 }
 
 .memo-item {
