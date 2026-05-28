@@ -50,12 +50,14 @@ async function handleLogout() {
   min-height: 100vh;
   max-width: 600px;
   margin: 0 auto;
+  background: var(--app-bg-soft);
+  transition: background 0.3s;
 }
 
 .list-header-bar {
   position: sticky;
   top: 0;
-  z-index: 10;
+  z-index: 100;
   display: flex;
   align-items: center;
   justify-content: space-between;

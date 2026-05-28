@@ -77,6 +77,7 @@ function formatDate(date: Date): string {
 
 <style scoped>
 .memo-list {
+  flex: 1;
   display: flex;
   flex-direction: column;
   background: var(--app-bg-soft);
