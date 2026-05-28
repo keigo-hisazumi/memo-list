@@ -25,7 +25,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
-          cache: npm
+          cache: 'npm'
 
       - name: Install dependencies
         run: npm ci
@@ -49,6 +49,7 @@ jobs:
           script: |
             const prNumber = context.issue.number;
             const previewUrl = `https://keigo-hisazumi.github.io/memo-list/pr-${prNumber}/`;
+            const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(previewUrl)}`;
             const marker = '<!-- pr-preview -->';
             const body = [
               marker,
@@ -58,6 +59,7 @@ jobs:
               `|---|---|`,
               `| **プレビューURL** | [${previewUrl}](${previewUrl}) |`,
               `| **コミット** | \`${context.sha.slice(0, 7)}\` |`,
+              `| **QRコード** | ![](${qrUrl}) |`,
               '',
               '*コードをプッシュするたびに自動更新されます。*',
             ].join('\n');
