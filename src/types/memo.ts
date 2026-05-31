@@ -8,6 +8,7 @@ export interface Memo {
   createdAt: Date
   updatedAt: Date
   category?: string
+  isPinned?: boolean
 }
 
 /**
