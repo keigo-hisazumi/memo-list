@@ -1,5 +1,5 @@
 <template>
-  <div class="hamburger-menu" ref="menuRef">
+  <div class="hamburger-menu">
     <!-- ハンバーガーボタン -->
     <button
       class="hamburger-btn"
@@ -17,9 +17,9 @@
       <div v-if="isOpen" class="menu-overlay" @click="closeMenu"></div>
     </Transition>
 
-    <!-- ドロップダウンメニュー -->
-    <Transition name="slide-down">
-      <div v-if="isOpen" class="menu-dropdown">
+    <!-- 左スライドドロワー -->
+    <Transition name="slide-left">
+      <div v-if="isOpen" class="menu-drawer" role="dialog" aria-modal="true">
 
         <!-- アカウント情報 -->
         <div class="menu-account">
@@ -37,7 +37,6 @@
         <!-- テーマ切り替え -->
         <button class="menu-item" @click="handleThemeToggle">
           <span class="menu-item-icon">
-            <!-- ダークモード時: 月アイコン / ライトモード時: 太陽アイコン（現在のモードを表示） -->
             <svg v-if="themeStore.isDark" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
             </svg>
@@ -76,7 +75,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useThemeStore } from '@/stores/theme'
 
@@ -88,7 +87,6 @@ const authStore = useAuthStore()
 const themeStore = useThemeStore()
 
 const isOpen = ref(false)
-const menuRef = ref<HTMLElement | null>(null)
 
 function toggleMenu() {
   isOpen.value = !isOpen.value
@@ -106,21 +104,6 @@ function handleLogout() {
   closeMenu()
   emit('logout')
 }
-
-// メニュー外クリックで閉じる
-function handleClickOutside(event: MouseEvent) {
-  if (menuRef.value && !menuRef.value.contains(event.target as Node)) {
-    closeMenu()
-  }
-}
-
-onMounted(() => {
-  document.addEventListener('mousedown', handleClickOutside)
-})
-
-onUnmounted(() => {
-  document.removeEventListener('mousedown', handleClickOutside)
-})
 </script>
 
 <style scoped>
@@ -144,6 +127,7 @@ onUnmounted(() => {
   cursor: pointer;
   padding: 6px;
   transition: background 0.2s;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .hamburger-btn:hover {
@@ -154,13 +138,12 @@ onUnmounted(() => {
   display: block;
   width: 20px;
   height: 2px;
-  background: var(--app-text-secondary);
+  background: var(--app-accent);
   border-radius: 2px;
   transition: transform 0.25s ease, opacity 0.25s ease;
   transform-origin: center;
 }
 
-/* バーのX変形アニメーション */
 .hamburger-btn.open .bar:nth-child(1) {
   transform: translateY(7px) rotate(45deg);
 }
@@ -174,33 +157,37 @@ onUnmounted(() => {
   transform: translateY(-7px) rotate(-45deg);
 }
 
-/* オーバーレイ */
+/* オーバーレイ（背景を暗くする） */
 .menu-overlay {
   position: fixed;
   inset: 0;
-  z-index: 99;
-}
-
-/* ドロップダウンメニュー */
-.menu-dropdown {
-  position: absolute;
-  top: calc(100% + 8px);
-  right: 0;
-  min-width: 240px;
-  background: var(--app-menu-bg);
-  border: 1px solid var(--app-border);
-  border-radius: 10px;
-  box-shadow: 0 8px 24px var(--app-menu-shadow);
-  overflow: hidden;
+  background: rgba(0, 0, 0, 0.4);
   z-index: 200;
 }
 
-/* アカウント情報（非インタラクティブ） */
+/* 左スライドドロワー */
+.menu-drawer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 280px;
+  max-width: 80vw;
+  background: var(--app-menu-bg);
+  border-right: 1px solid var(--app-border);
+  box-shadow: 4px 0 20px var(--app-menu-shadow);
+  z-index: 300;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+/* アカウント情報 */
 .menu-account {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 1rem 1.25rem;
+  padding: 1.25rem 1.25rem;
   cursor: default;
   pointer-events: none;
   user-select: none;
@@ -216,23 +203,20 @@ onUnmounted(() => {
   text-overflow: ellipsis;
   white-space: nowrap;
   max-width: 180px;
-  text-decoration: none;
-  -webkit-touch-callout: none;
 }
 
 .account-avatar {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
   background: var(--app-header-bg);
   border: 1px solid var(--app-border);
   border-radius: 50%;
   color: var(--app-accent);
   flex-shrink: 0;
 }
-
 
 /* 区切り線 */
 .menu-divider {
@@ -247,15 +231,16 @@ onUnmounted(() => {
   align-items: center;
   gap: 0.75rem;
   width: 100%;
-  padding: 0.75rem 1.25rem;
+  padding: 0.9rem 1.25rem;
   background: transparent;
   border: none;
   cursor: pointer;
-  font-size: 0.875rem;
+  font-size: 0.9rem;
   color: var(--app-text-secondary);
   text-align: left;
   transition: background 0.15s, color 0.15s;
   font-family: inherit;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .menu-item:hover {
@@ -286,10 +271,10 @@ onUnmounted(() => {
   color: var(--app-logout-hover-text);
 }
 
-/* トランジション */
+/* トランジション: オーバーレイ */
 .fade-enter-active,
 .fade-leave-active {
-  transition: opacity 0.2s ease;
+  transition: opacity 0.25s ease;
 }
 
 .fade-enter-from,
@@ -297,21 +282,17 @@ onUnmounted(() => {
   opacity: 0;
 }
 
-.slide-down-enter-active {
-  transition: opacity 0.2s ease, transform 0.2s ease;
+/* トランジション: ドロワー（左からスライド） */
+.slide-left-enter-active {
+  transition: transform 0.28s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
-.slide-down-leave-active {
-  transition: opacity 0.15s ease, transform 0.15s ease;
+.slide-left-leave-active {
+  transition: transform 0.22s cubic-bezier(0.55, 0, 0.55, 0.2);
 }
 
-.slide-down-enter-from {
-  opacity: 0;
-  transform: translateY(-8px);
-}
-
-.slide-down-leave-to {
-  opacity: 0;
-  transform: translateY(-4px);
+.slide-left-enter-from,
+.slide-left-leave-to {
+  transform: translateX(-100%);
 }
 </style>

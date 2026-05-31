@@ -26,9 +26,11 @@ export const useMemoStore = defineStore('memo', () => {
   )
 
   const sortedMemos = computed(() =>
-    [...memos.value].sort((a, b) =>
-      b.updatedAt.getTime() - a.updatedAt.getTime()
-    )
+    [...memos.value].sort((a, b) => {
+      if (a.isPinned && !b.isPinned) return -1
+      if (!a.isPinned && b.isPinned) return 1
+      return b.updatedAt.getTime() - a.updatedAt.getTime()
+    })
   )
 
   const categories = computed(() => {
@@ -55,6 +57,7 @@ export const useMemoStore = defineStore('memo', () => {
           title: data.title ?? '',
           content: data.content ?? '',
           category: data.category,
+          isPinned: data.isPinned ?? false,
           createdAt: (data.createdAt as Timestamp).toDate(),
           updatedAt: (data.updatedAt as Timestamp).toDate()
         }

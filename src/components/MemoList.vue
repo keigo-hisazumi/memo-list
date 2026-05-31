@@ -1,35 +1,29 @@
 <template>
   <div class="memo-list">
-    <div class="memo-list-body">
-      <div v-if="memos.length === 0" class="empty-state">
-        <p>メモがありません</p>
-        <p class="empty-hint">右下のボタンでメモを追加しましょう</p>
-      </div>
+    <div v-if="memos.length === 0" class="empty-state">
+      <p>メモがありません</p>
+      <p class="empty-hint">右上のボタンでメモを追加しましょう</p>
+    </div>
 
-      <div v-else class="memo-items">
-        <div
-          v-for="memo in memos"
-          :key="memo.id"
-          :class="['memo-item', { active: selectedId === memo.id }]"
-          @click="$emit('select', memo.id)"
-        >
-          <div class="memo-item-header">
+    <div v-else class="memo-items">
+      <div
+        v-for="memo in memos"
+        :key="memo.id"
+        :class="['memo-item', { active: selectedId === memo.id }]"
+        @click="$emit('select', memo.id)"
+      >
+        <div class="memo-item-inner">
+          <span v-if="memo.isPinned" class="pin-icon" aria-label="ピン留め">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M16 12V4h1V2H7v2h1v8l-2 2v2h5.2v6h1.6v-6H18v-2l-2-2z"/>
+            </svg>
+          </span>
+          <div class="memo-content">
             <h3 class="memo-title">{{ memo.title || '無題のメモ' }}</h3>
-            <span v-if="memo.category" class="memo-category">{{ memo.category }}</span>
-          </div>
-          <p class="memo-preview">{{ getPreview(memo.content) }}</p>
-          <div class="memo-meta">
-            <span class="memo-date">{{ formatDate(memo.updatedAt) }}</span>
+            <p class="memo-preview">{{ getPreview(memo.content) }}</p>
           </div>
         </div>
       </div>
-
-      <button @click="$emit('create')" class="fab-create" aria-label="新規作成">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="12" y1="5" x2="12" y2="19" />
-          <line x1="5" y1="12" x2="19" y2="12" />
-        </svg>
-      </button>
     </div>
   </div>
 </template>
@@ -46,32 +40,12 @@ defineProps<Props>()
 
 defineEmits<{
   select: [id: string]
-  create: []
 }>()
 
-function getPreview(content: string, maxLength = 60): string {
+function getPreview(content: string, maxLength = 100): string {
   const stripped = content.replace(/\n/g, ' ').trim()
   if (stripped.length <= maxLength) return stripped
   return stripped.substring(0, maxLength) + '...'
-}
-
-function formatDate(date: Date): string {
-  const now = new Date()
-  const diff = now.getTime() - date.getTime()
-  const minutes = Math.floor(diff / 60000)
-  const hours = Math.floor(diff / 3600000)
-  const days = Math.floor(diff / 86400000)
-
-  if (minutes < 1) return 'たった今'
-  if (minutes < 60) return `${minutes}分前`
-  if (hours < 24) return `${hours}時間前`
-  if (days < 7) return `${days}日前`
-
-  return date.toLocaleDateString('ja-JP', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit'
-  })
 }
 </script>
 
@@ -80,47 +54,8 @@ function formatDate(date: Date): string {
   flex: 1;
   display: flex;
   flex-direction: column;
-  background: var(--app-bg-soft);
+  background: var(--app-bg);
   transition: background 0.3s;
-}
-
-.memo-list-body {
-  position: relative;
-  padding-bottom: 5rem;
-}
-
-.fab-create {
-  position: fixed;
-  bottom: 2rem;
-  right: 2rem;
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background: var(--app-accent);
-  color: white;
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.45);
-  transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
-  z-index: 20;
-}
-
-.fab-create svg {
-  width: 26px;
-  height: 26px;
-}
-
-.fab-create:hover {
-  background: var(--app-accent-hover);
-  transform: scale(1.08);
-  box-shadow: 0 6px 18px rgba(102, 126, 234, 0.55);
-}
-
-.fab-create:active {
-  transform: scale(0.95);
 }
 
 .empty-state {
@@ -139,78 +74,67 @@ function formatDate(date: Date): string {
 }
 
 .memo-items {
-  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
 }
 
 .memo-item {
   background: var(--app-bg);
-  padding: 1rem 1.5rem;
-  margin-bottom: 0.5rem;
-  border-radius: 8px;
   cursor: pointer;
-  transition: all 0.2s;
-  border: 2px solid transparent;
+  border-bottom: 1px solid var(--app-border);
+  transition: background 0.15s;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.memo-item:hover {
-  box-shadow: 0 2px 8px var(--app-shadow);
+.memo-item:last-child {
+  border-bottom: none;
 }
 
+.memo-item:active,
 .memo-item.active {
-  border-color: var(--app-active-border);
   background: var(--app-active-bg);
 }
 
-.memo-item-header {
+.memo-item-inner {
   display: flex;
-  justify-content: space-between;
   align-items: flex-start;
-  gap: 1rem;
-  margin-bottom: 0.5rem;
+  gap: 0.5rem;
+  padding: 0.85rem 1rem;
+}
+
+.pin-icon {
+  color: #3b82f6;
+  flex-shrink: 0;
+  margin-top: 2px;
+  display: flex;
+  align-items: center;
+}
+
+.memo-content {
+  flex: 1;
+  min-width: 0;
 }
 
 .memo-title {
-  margin: 0;
+  margin: 0 0 0.2rem;
   font-size: 1rem;
   font-weight: 600;
   color: var(--app-text);
-  flex: 1;
+  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
   transition: color 0.3s;
-}
-
-.memo-category {
-  padding: 0.25rem 0.75rem;
-  background: var(--app-category-bg);
-  color: var(--app-category-text);
-  border-radius: 12px;
-  font-size: 0.75rem;
-  font-weight: 500;
-  white-space: nowrap;
-  transition: background 0.3s, color 0.3s;
 }
 
 .memo-preview {
-  margin: 0 0 0.5rem;
-  font-size: 0.875rem;
+  margin: 0;
+  font-size: 0.82rem;
   color: var(--app-text-secondary);
-  line-height: 1.4;
+  line-height: 1.45;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  transition: color 0.3s;
-}
-
-.memo-meta {
-  display: flex;
-  justify-content: flex-end;
-}
-
-.memo-date {
-  font-size: 0.75rem;
-  color: var(--app-text-muted);
   transition: color 0.3s;
 }
 </style>
