@@ -15,7 +15,7 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       base,
-      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'icon.svg'],
+      includeAssets: ['favicon.ico', 'icon.svg', 'apple-touch-icon.png', 'icons/*.png'],
       manifest: {
         name: 'メモリスト - Memo List',
         short_name: 'メモリスト',
