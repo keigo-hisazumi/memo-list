@@ -129,7 +129,7 @@ function getErrorMessage(e: unknown): string {
   text-align: center;
   font-size: 1.75rem;
   font-weight: 700;
-  color: #42b883;
+  color: #667eea;
   margin-bottom: 0.25rem;
 }
 
@@ -169,7 +169,7 @@ function getErrorMessage(e: unknown): string {
 }
 
 .form-group input:focus {
-  border-color: #42b883;
+  border-color: #667eea;
 }
 
 .error-message {
@@ -187,7 +187,7 @@ function getErrorMessage(e: unknown): string {
   justify-content: center;
   gap: 0.5rem;
   padding: 0.875rem;
-  background: #42b883;
+  background: #667eea;
   color: white;
   border: none;
   border-radius: 8px;
@@ -199,7 +199,7 @@ function getErrorMessage(e: unknown): string {
 }
 
 .btn-submit:hover:not(:disabled) {
-  background: #359268;
+  background: #5a6fd6;
 }
 
 .btn-submit:disabled {
@@ -228,7 +228,7 @@ function getErrorMessage(e: unknown): string {
   padding: 0.5rem;
   background: transparent;
   border: none;
-  color: #42b883;
+  color: #667eea;
   font-size: 0.875rem;
   cursor: pointer;
   text-align: center;
@@ -236,6 +236,6 @@ function getErrorMessage(e: unknown): string {
 }
 
 .btn-toggle:hover {
-  color: #359268;
+  color: #5a6fd6;
 }
 </style>
