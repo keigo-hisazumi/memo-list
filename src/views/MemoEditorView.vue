@@ -1,13 +1,46 @@
 <template>
   <div class="memo-editor-view">
-    <div class="editor-header-nav">
+    <div class="editor-nav">
       <button @click="handleBack" class="btn-back">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
           <polyline points="15 18 9 12 15 6"/>
         </svg>
-        <span>戻る</span>
+        <span>すべてのノート</span>
       </button>
+      <div class="nav-actions">
+        <button class="nav-icon-btn" title="情報" @click="toggleInfo">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="8" x2="12" y2="8" stroke-width="3" stroke-linecap="round"/>
+            <line x1="12" y1="12" x2="12" y2="16"/>
+          </svg>
+        </button>
+        <button class="nav-icon-btn" title="その他" @click="toggleMenu">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="5" cy="12" r="1.2" fill="currentColor"/>
+            <circle cx="12" cy="12" r="1.2" fill="currentColor"/>
+            <circle cx="19" cy="12" r="1.2" fill="currentColor"/>
+          </svg>
+        </button>
+        <button class="nav-icon-btn nav-icon-compose" title="新規メモ" @click="handleNew">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+          </svg>
+        </button>
+      </div>
+
+      <div v-if="showMenu" class="action-menu" @click.stop>
+        <button class="action-menu-item action-menu-delete" @click="handleDeleteFromMenu">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="3 6 5 6 21 6"/>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+          </svg>
+          削除
+        </button>
+      </div>
     </div>
+
     <MemoEditor
       :memo="memoStore.selectedMemo"
       @update="handleUpdateMemo"
@@ -17,7 +50,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, watch } from 'vue'
+import { ref, onMounted, watch, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useMemoStore } from '@/stores/memo'
 import { useAuthStore } from '@/stores/auth'
@@ -28,16 +61,50 @@ const route = useRoute()
 const memoStore = useMemoStore()
 const authStore = useAuthStore()
 
+const showMenu = ref(false)
+const showInfo = ref(false)
+
 onMounted(() => {
   memoStore.selectMemo(route.params.id as string)
+  document.addEventListener('click', closeMenus)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('click', closeMenus)
 })
 
 watch(() => route.params.id, (newId) => {
   if (newId) memoStore.selectMemo(newId as string)
 })
 
+function closeMenus() {
+  showMenu.value = false
+  showInfo.value = false
+}
+
+function toggleMenu() {
+  showMenu.value = !showMenu.value
+  showInfo.value = false
+}
+
+function toggleInfo() {
+  showInfo.value = !showInfo.value
+  showMenu.value = false
+}
+
 function handleBack() {
   router.push({ name: 'memo-list' })
+}
+
+function handleNew() {
+  router.push({ name: 'memo-list' })
+}
+
+function handleDeleteFromMenu() {
+  showMenu.value = false
+  if (memoStore.selectedMemo) {
+    handleDeleteMemo(memoStore.selectedMemo.id)
+  }
 }
 
 async function handleUpdateMemo(id: string, data: { title?: string; content?: string; category?: string }) {
@@ -47,8 +114,10 @@ async function handleUpdateMemo(id: string, data: { title?: string; content?: st
 
 async function handleDeleteMemo(id: string) {
   if (!authStore.currentUser) return
-  await memoStore.deleteMemo(authStore.currentUser.uid, id)
-  router.push({ name: 'memo-list' })
+  if (confirm(`このメモを削除してもよろしいですか？`)) {
+    await memoStore.deleteMemo(authStore.currentUser.uid, id)
+    router.push({ name: 'memo-list' })
+  }
 }
 </script>
 
@@ -62,41 +131,99 @@ async function handleDeleteMemo(id: string) {
   transition: background 0.3s;
   max-width: 600px;
   margin: 0 auto;
+  position: relative;
 }
 
-.editor-header-nav {
-  padding: 1rem 1.5rem;
-  border-bottom: 1px solid var(--app-border);
+.editor-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.6rem 0.75rem;
   background: var(--app-bg);
-  transition: background 0.3s, border-color 0.3s;
+  transition: background 0.3s;
+  position: relative;
+  flex-shrink: 0;
 }
 
 .btn-back {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 1rem;
+  gap: 0.1rem;
+  padding: 0.4rem 0.5rem;
   background: transparent;
-  border: 1px solid var(--app-border);
+  border: none;
   border-radius: 6px;
-  font-size: 0.9rem;
-  font-weight: 500;
+  font-size: 1rem;
+  font-weight: 400;
   cursor: pointer;
-  transition: all 0.2s;
-  color: var(--app-text-secondary);
+  color: var(--app-accent);
+  transition: opacity 0.15s;
 }
 
 .btn-back:hover {
-  background: var(--app-bg-soft);
-  border-color: var(--app-accent);
-  color: var(--app-accent);
+  opacity: 0.7;
 }
 
 .btn-back svg {
-  transition: transform 0.2s;
+  flex-shrink: 0;
 }
 
-.btn-back:hover svg {
-  transform: translateX(-2px);
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.1rem;
+}
+
+.nav-icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: transparent;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  color: var(--app-accent);
+  transition: opacity 0.15s;
+}
+
+.nav-icon-btn:hover {
+  opacity: 0.7;
+}
+
+.action-menu {
+  position: absolute;
+  top: calc(100% - 4px);
+  right: 0.75rem;
+  background: var(--app-menu-bg);
+  border: 1px solid var(--app-border);
+  border-radius: 10px;
+  box-shadow: 0 4px 16px var(--app-shadow);
+  z-index: 100;
+  min-width: 140px;
+  overflow: hidden;
+}
+
+.action-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: transparent;
+  border: none;
+  font-size: 0.95rem;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s;
+}
+
+.action-menu-item:hover {
+  background: var(--app-menu-hover);
+}
+
+.action-menu-delete {
+  color: var(--app-delete-hover-text);
 }
 </style>
