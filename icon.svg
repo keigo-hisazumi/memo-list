@@ -2,7 +2,7 @@
   <title id="title">Memo List Icon</title>
   <desc id="desc">Rounded memo sheet with list lines and a pencil check mark.</desc>
 
-  <rect x="0" y="0" width="256" height="256" rx="0" fill="#4F46E5"/>
+  <rect x="0" y="0" width="256" height="256" rx="0" fill="#667eea"/>
   <rect x="58" y="44" width="140" height="168" rx="18" fill="#FFFFFF"/>
 
   <rect x="78" y="84" width="76" height="10" rx="5" fill="#A5B4FC"/>
