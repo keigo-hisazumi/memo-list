@@ -211,10 +211,10 @@ function handleLogout() {
   justify-content: center;
   width: 40px;
   height: 40px;
-  background: var(--app-header-bg);
-  border: 1px solid var(--app-border);
+  background: var(--app-accent);
+  border: 1px solid var(--app-accent);
   border-radius: 50%;
-  color: var(--app-accent);
+  color: #ffffff;
   flex-shrink: 0;
 }
 
