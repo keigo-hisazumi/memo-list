@@ -103,7 +103,7 @@ function getPreview(content: string, maxLength = 100): string {
 }
 
 .pin-icon {
-  color: #3b82f6;
+  color: #667eea;
   flex-shrink: 0;
   margin-top: 2px;
   display: flex;
