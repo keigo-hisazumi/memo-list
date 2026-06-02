@@ -15,18 +15,21 @@
     <template v-else>
       <div class="editor-scroll">
         <input
+          ref="titleRef"
           v-model="localTitle"
           type="text"
           class="title-input"
           placeholder="タイトル"
+          @keydown.enter.prevent="focusContent"
           @input="handleUpdate"
         />
-        <div class="meta-date">{{ formatDate(memo.updatedAt) }}</div>
         <textarea
+          ref="contentRef"
           v-model="localContent"
           class="content-textarea"
           placeholder="メモを入力..."
           @input="handleUpdate"
+          @keydown="handleContentKeydown"
         />
       </div>
 
@@ -50,7 +53,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, watch, nextTick } from 'vue'
 import type { Memo } from '@/types/memo'
 
 interface Props {
@@ -68,6 +71,9 @@ const localTitle = ref('')
 const localContent = ref('')
 const localCategory = ref('')
 
+const titleRef = ref<HTMLInputElement | null>(null)
+const contentRef = ref<HTMLTextAreaElement | null>(null)
+
 watch(() => props.memo, (newMemo) => {
   if (newMemo) {
     localTitle.value = newMemo.title
@@ -80,22 +86,28 @@ watch(() => props.memo, (newMemo) => {
   }
 }, { immediate: true })
 
+function focusContent() {
+  nextTick(() => contentRef.value?.focus())
+}
+
+function handleContentKeydown(e: KeyboardEvent) {
+  if (e.key === 'Backspace') {
+    const textarea = e.target as HTMLTextAreaElement
+    if (textarea.selectionStart === 0 && textarea.selectionEnd === 0) {
+      e.preventDefault()
+      const end = localTitle.value.length
+      titleRef.value?.focus()
+      nextTick(() => titleRef.value?.setSelectionRange(end, end))
+    }
+  }
+}
+
 function handleUpdate() {
   if (!props.memo) return
   emit('update', props.memo.id, {
     title: localTitle.value,
     content: localContent.value,
     category: localCategory.value || undefined
-  })
-}
-
-function formatDate(date: Date): string {
-  return date.toLocaleString('ja-JP', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
   })
 }
 </script>
@@ -136,7 +148,7 @@ function formatDate(date: Date): string {
 .editor-scroll {
   flex: 1;
   overflow-y: auto;
-  padding: 1rem 1.25rem 0.5rem;
+  padding: 0.75rem 1.25rem 0.5rem;
   display: flex;
   flex-direction: column;
 }
@@ -148,23 +160,16 @@ function formatDate(date: Date): string {
   border: none;
   outline: none;
   padding: 0;
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.5rem;
   color: var(--app-text);
   background: transparent;
   line-height: 1.3;
+  font-family: inherit;
   transition: color 0.3s;
 }
 
 .title-input::placeholder {
   color: var(--app-text-placeholder);
-  font-weight: 700;
-}
-
-.meta-date {
-  font-size: 0.8rem;
-  color: var(--app-text-muted);
-  margin-bottom: 1rem;
-  transition: color 0.3s;
 }
 
 .content-textarea {
@@ -213,6 +218,7 @@ function formatDate(date: Date): string {
   font-size: 0.9rem;
   color: var(--app-text-secondary);
   background: transparent;
+  font-family: inherit;
   transition: color 0.3s;
 }
 

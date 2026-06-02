@@ -7,36 +7,49 @@
         </svg>
         <span>すべてのノート</span>
       </button>
+
       <div class="nav-actions">
-        <button class="nav-icon-btn" title="情報" @click="toggleInfo">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-            <circle cx="12" cy="12" r="10"/>
-            <line x1="12" y1="8" x2="12" y2="8" stroke-width="3" stroke-linecap="round"/>
-            <line x1="12" y1="12" x2="12" y2="16"/>
-          </svg>
-        </button>
-        <button class="nav-icon-btn" title="その他" @click="toggleMenu">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="5" cy="12" r="1.2" fill="currentColor"/>
-            <circle cx="12" cy="12" r="1.2" fill="currentColor"/>
-            <circle cx="19" cy="12" r="1.2" fill="currentColor"/>
-          </svg>
-        </button>
+        <div class="nav-icon-wrap">
+          <button class="nav-icon-btn" title="情報" @click.stop="toggleInfo">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="12" y1="8" x2="12" y2="8" stroke-width="3" stroke-linecap="round"/>
+              <line x1="12" y1="12" x2="12" y2="16"/>
+            </svg>
+          </button>
+          <div v-if="showInfo && memoStore.selectedMemo" class="info-popup">
+            <p class="info-label">更新日時</p>
+            <p class="info-value">{{ formatDate(memoStore.selectedMemo.updatedAt) }}</p>
+            <p class="info-label info-label-mt">作成日時</p>
+            <p class="info-value">{{ formatDate(memoStore.selectedMemo.createdAt) }}</p>
+          </div>
+        </div>
+
+        <div class="nav-icon-wrap">
+          <button class="nav-icon-btn" title="その他" @click.stop="toggleMenu">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <circle cx="12" cy="12" r="10"/>
+              <circle cx="7.5" cy="12" r="1.1" fill="currentColor" stroke="none"/>
+              <circle cx="12" cy="12" r="1.1" fill="currentColor" stroke="none"/>
+              <circle cx="16.5" cy="12" r="1.1" fill="currentColor" stroke="none"/>
+            </svg>
+          </button>
+          <div v-if="showMenu" class="action-menu" @click.stop>
+            <button class="action-menu-item action-menu-delete" @click="handleDeleteFromMenu">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="3 6 5 6 21 6"/>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+              </svg>
+              削除
+            </button>
+          </div>
+        </div>
+
         <button class="nav-icon-btn nav-icon-compose" title="新規メモ" @click="handleNew">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
             <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
             <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
           </svg>
-        </button>
-      </div>
-
-      <div v-if="showMenu" class="action-menu" @click.stop>
-        <button class="action-menu-item action-menu-delete" @click="handleDeleteFromMenu">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <polyline points="3 6 5 6 21 6"/>
-            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
-          </svg>
-          削除
         </button>
       </div>
     </div>
@@ -66,18 +79,18 @@ const showInfo = ref(false)
 
 onMounted(() => {
   memoStore.selectMemo(route.params.id as string)
-  document.addEventListener('click', closeMenus)
+  document.addEventListener('click', closeAll)
 })
 
 onUnmounted(() => {
-  document.removeEventListener('click', closeMenus)
+  document.removeEventListener('click', closeAll)
 })
 
 watch(() => route.params.id, (newId) => {
   if (newId) memoStore.selectMemo(newId as string)
 })
 
-function closeMenus() {
+function closeAll() {
   showMenu.value = false
   showInfo.value = false
 }
@@ -107,6 +120,16 @@ function handleDeleteFromMenu() {
   }
 }
 
+function formatDate(date: Date): string {
+  return date.toLocaleString('ja-JP', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  })
+}
+
 async function handleUpdateMemo(id: string, data: { title?: string; content?: string; category?: string }) {
   if (!authStore.currentUser) return
   await memoStore.updateMemo(authStore.currentUser.uid, id, data)
@@ -131,7 +154,6 @@ async function handleDeleteMemo(id: string) {
   transition: background 0.3s;
   max-width: 600px;
   margin: 0 auto;
-  position: relative;
 }
 
 .editor-nav {
@@ -141,7 +163,6 @@ async function handleDeleteMemo(id: string) {
   padding: 0.6rem 0.75rem;
   background: var(--app-bg);
   transition: background 0.3s;
-  position: relative;
   flex-shrink: 0;
 }
 
@@ -164,14 +185,14 @@ async function handleDeleteMemo(id: string) {
   opacity: 0.7;
 }
 
-.btn-back svg {
-  flex-shrink: 0;
-}
-
 .nav-actions {
   display: flex;
   align-items: center;
   gap: 0.1rem;
+}
+
+.nav-icon-wrap {
+  position: relative;
 }
 
 .nav-icon-btn {
@@ -192,10 +213,40 @@ async function handleDeleteMemo(id: string) {
   opacity: 0.7;
 }
 
+/* info popup */
+.info-popup {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  background: var(--app-menu-bg);
+  border: 1px solid var(--app-border);
+  border-radius: 10px;
+  box-shadow: 0 4px 16px var(--app-shadow);
+  z-index: 100;
+  min-width: 200px;
+  padding: 0.75rem 1rem;
+}
+
+.info-label {
+  font-size: 0.7rem;
+  color: var(--app-text-muted);
+  margin-bottom: 0.15rem;
+}
+
+.info-label-mt {
+  margin-top: 0.6rem;
+}
+
+.info-value {
+  font-size: 0.875rem;
+  color: var(--app-text);
+}
+
+/* more menu */
 .action-menu {
   position: absolute;
-  top: calc(100% - 4px);
-  right: 0.75rem;
+  top: calc(100% + 6px);
+  right: 0;
   background: var(--app-menu-bg);
   border: 1px solid var(--app-border);
   border-radius: 10px;
@@ -216,6 +267,7 @@ async function handleDeleteMemo(id: string) {
   font-size: 0.95rem;
   cursor: pointer;
   text-align: left;
+  font-family: inherit;
   transition: background 0.15s;
 }
 
