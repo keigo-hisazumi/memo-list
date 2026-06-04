@@ -79,7 +79,8 @@ async function handleLogout() {
 .memo-list-view {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  height: 100vh;
+  overflow-y: auto;
   max-width: 600px;
   margin: 0 auto;
   background: var(--app-bg);
