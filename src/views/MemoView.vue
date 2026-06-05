@@ -240,6 +240,7 @@ async function handleLogout() {
 }
 
 .list-header-bar {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: space-between;
