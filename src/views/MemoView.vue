@@ -447,6 +447,10 @@ async function handleLogout() {
     width: 100%;
   }
 
+  .memo-sidebar {
+    border-right: none;
+  }
+
   .mobile-hidden {
     display: none;
   }

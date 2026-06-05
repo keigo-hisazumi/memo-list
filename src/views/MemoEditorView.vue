@@ -160,9 +160,10 @@ async function handleDeleteMemo(id: string) {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.6rem 0.75rem;
+  padding: 0.5rem 0.75rem;
   background: var(--app-bg);
-  transition: background 0.3s;
+  border-bottom: 1px solid var(--app-border);
+  transition: background 0.3s, border-color 0.3s;
   flex-shrink: 0;
 }
 
