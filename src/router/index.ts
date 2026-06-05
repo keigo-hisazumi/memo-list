@@ -1,7 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
-import MemoListView from '../views/MemoListView.vue'
-import MemoEditorView from '../views/MemoEditorView.vue'
+import MemoView from '../views/MemoView.vue'
 import LoginView from '../views/LoginView.vue'
 
 const router = createRouter({
@@ -16,13 +15,13 @@ const router = createRouter({
     {
       path: '/',
       name: 'memo-list',
-      component: MemoListView,
+      component: MemoView,
       meta: { requiresAuth: true }
     },
     {
       path: '/memo/:id',
       name: 'memo-edit',
-      component: MemoEditorView,
+      component: MemoView,
       meta: { requiresAuth: true }
     },
   ],
