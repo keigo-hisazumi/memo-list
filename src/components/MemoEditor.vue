@@ -74,11 +74,12 @@ const localCategory = ref('')
 const titleRef = ref<HTMLInputElement | null>(null)
 const contentRef = ref<HTMLTextAreaElement | null>(null)
 
-watch(() => props.memo, (newMemo) => {
-  if (newMemo) {
-    localTitle.value = newMemo.title
-    localContent.value = newMemo.content
-    localCategory.value = newMemo.category || ''
+watch(() => props.memo?.id, () => {
+  const memo = props.memo
+  if (memo) {
+    localTitle.value = memo.title
+    localContent.value = memo.content
+    localCategory.value = memo.category || ''
   } else {
     localTitle.value = ''
     localContent.value = ''
