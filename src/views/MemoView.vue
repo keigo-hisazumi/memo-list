@@ -5,7 +5,7 @@
       <div class="list-header-bar">
         <HamburgerMenu @logout="handleLogout" />
         <span class="app-title">すべてのノート</span>
-        <button class="compose-btn" @click="handleCreateMemo" aria-label="新規作成">
+        <button class="nav-icon-btn" @click="handleCreateMemo" aria-label="新規作成">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
             <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
             <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
@@ -262,25 +262,6 @@ async function handleLogout() {
   transform: translateX(-50%);
 }
 
-.compose-btn {
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  color: var(--app-accent);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  border-radius: 6px;
-  padding: 0;
-  transition: background 0.2s;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.compose-btn:hover {
-  background: var(--app-menu-hover);
-}
 
 .search-bar-wrap {
   padding: 0.6rem 0.75rem;
