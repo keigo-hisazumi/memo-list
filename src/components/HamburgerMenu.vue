@@ -311,7 +311,11 @@ function handleLogout() {
   color: var(--app-text-secondary);
 }
 
-/* ログアウトボタン */
+/* ログアウトボタン（下部セーフエリア対応） */
+.logout-item {
+  padding-bottom: calc(0.9rem + env(safe-area-inset-bottom));
+}
+
 .logout-item:hover {
   color: var(--app-logout-hover-text);
 }
