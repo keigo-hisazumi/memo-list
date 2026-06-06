@@ -21,14 +21,14 @@
           class="title-input"
           placeholder="タイトル"
           @keydown.enter.prevent="focusContent"
-          @input="handleUpdate"
+          @input="handleTitleUpdate"
         />
         <textarea
           ref="contentRef"
           v-model="localContent"
           class="content-textarea"
           placeholder="メモを入力..."
-          @input="handleUpdate"
+          @input="handleContentUpdate"
           @keydown="handleContentKeydown"
         />
       </div>
@@ -44,7 +44,7 @@
             type="text"
             class="category-input"
             placeholder="タグを追加..."
-            @input="handleUpdate"
+            @input="handleCategoryUpdate"
           />
         </div>
       </div>
@@ -103,13 +103,19 @@ function handleContentKeydown(e: KeyboardEvent) {
   }
 }
 
-function handleUpdate() {
+function handleTitleUpdate() {
   if (!props.memo) return
-  emit('update', props.memo.id, {
-    title: localTitle.value,
-    content: localContent.value,
-    category: localCategory.value || undefined
-  })
+  emit('update', props.memo.id, { title: localTitle.value })
+}
+
+function handleContentUpdate() {
+  if (!props.memo) return
+  emit('update', props.memo.id, { content: localContent.value })
+}
+
+function handleCategoryUpdate() {
+  if (!props.memo) return
+  emit('update', props.memo.id, { category: localCategory.value || undefined })
 }
 </script>
 
