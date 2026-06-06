@@ -20,6 +20,7 @@
           type="text"
           class="title-input"
           placeholder="タイトル"
+          autocomplete="off"
           @keydown.enter.prevent="focusContent"
           @input="handleTitleUpdate"
         />
@@ -28,6 +29,7 @@
           v-model="localContent"
           class="content-textarea"
           placeholder="メモを入力..."
+          autocomplete="off"
           @input="handleContentUpdate"
           @keydown="handleContentKeydown"
         />
@@ -88,7 +90,7 @@ watch(() => props.memo?.id, () => {
 }, { immediate: true })
 
 function focusContent() {
-  nextTick(() => contentRef.value?.focus())
+  setTimeout(() => contentRef.value?.focus(), 0)
 }
 
 function handleContentKeydown(e: KeyboardEvent) {
