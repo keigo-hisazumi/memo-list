@@ -18,6 +18,7 @@ import type { Memo, CreateMemoInput, UpdateMemoInput } from '@/types/memo'
 
 export const useMemoStore = defineStore('memo', () => {
   const memos = ref<Memo[]>([])
+  const trashMemos = ref<Memo[]>([])
   const selectedMemoId = ref<string | null>(null)
   let unsubscribe: Unsubscribe | null = null
 
@@ -30,6 +31,14 @@ export const useMemoStore = defineStore('memo', () => {
       if (a.isPinned && !b.isPinned) return -1
       if (!a.isPinned && b.isPinned) return 1
       return b.updatedAt.getTime() - a.updatedAt.getTime()
+    })
+  )
+
+  const sortedTrashMemos = computed(() =>
+    [...trashMemos.value].sort((a, b) => {
+      const aTime = a.deletedAt?.getTime() ?? 0
+      const bTime = b.deletedAt?.getTime() ?? 0
+      return bTime - aTime
     })
   )
 
@@ -50,18 +59,28 @@ export const useMemoStore = defineStore('memo', () => {
 
     const q = query(memosRef(userId), orderBy('updatedAt', 'desc'))
     unsubscribe = onSnapshot(q, (snapshot) => {
-      memos.value = snapshot.docs.map(d => {
+      const active: Memo[] = []
+      const trash: Memo[] = []
+      snapshot.docs.forEach(d => {
         const data = d.data()
-        return {
+        const memo: Memo = {
           id: d.id,
           title: data.title ?? '',
           content: data.content ?? '',
           category: data.category,
           isPinned: data.isPinned ?? false,
           createdAt: (data.createdAt as Timestamp).toDate(),
-          updatedAt: (data.updatedAt as Timestamp).toDate()
+          updatedAt: (data.updatedAt as Timestamp).toDate(),
+          deletedAt: data.deletedAt ? (data.deletedAt as Timestamp).toDate() : undefined
+        }
+        if (memo.deletedAt) {
+          trash.push(memo)
+        } else {
+          active.push(memo)
         }
       })
+      memos.value = active
+      trashMemos.value = trash
     })
   }
 
@@ -71,6 +90,7 @@ export const useMemoStore = defineStore('memo', () => {
       unsubscribe = null
     }
     memos.value = []
+    trashMemos.value = []
     selectedMemoId.value = null
   }
 
@@ -107,10 +127,27 @@ export const useMemoStore = defineStore('memo', () => {
 
   async function deleteMemo(userId: string, id: string): Promise<void> {
     const ref = doc(db, 'users', userId, 'memos', id)
-    await deleteDoc(ref)
+    await updateDoc(ref, { deletedAt: Timestamp.now() })
     if (selectedMemoId.value === id) {
       selectedMemoId.value = null
     }
+  }
+
+  async function restoreMemo(userId: string, id: string): Promise<void> {
+    const ref = doc(db, 'users', userId, 'memos', id)
+    await updateDoc(ref, { deletedAt: deleteField() })
+  }
+
+  async function permanentlyDeleteMemo(userId: string, id: string): Promise<void> {
+    const ref = doc(db, 'users', userId, 'memos', id)
+    await deleteDoc(ref)
+  }
+
+  async function emptyTrash(userId: string): Promise<void> {
+    const deletions = trashMemos.value.map(memo =>
+      deleteDoc(doc(db, 'users', userId, 'memos', memo.id))
+    )
+    await Promise.all(deletions)
   }
 
   function selectMemo(id: string | null) {
@@ -135,15 +172,20 @@ export const useMemoStore = defineStore('memo', () => {
 
   return {
     memos,
+    trashMemos,
     selectedMemoId,
     selectedMemo,
     sortedMemos,
+    sortedTrashMemos,
     categories,
     subscribeToMemos,
     unsubscribeFromMemos,
     createMemo,
     updateMemo,
     deleteMemo,
+    restoreMemo,
+    permanentlyDeleteMemo,
+    emptyTrash,
     selectMemo,
     getMemoById,
     filterByCategory,

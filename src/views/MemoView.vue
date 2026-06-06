@@ -78,7 +78,7 @@
                   <polyline points="3 6 5 6 21 6"/>
                   <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
                 </svg>
-                削除
+                ゴミ箱に移動
               </button>
             </div>
           </div>
@@ -208,10 +208,8 @@ async function handleUpdateMemo(id: string, data: { title?: string; content?: st
 
 async function handleDeleteMemo(id: string) {
   if (!authStore.currentUser) return
-  if (confirm('このメモを削除してもよろしいですか？')) {
-    await memoStore.deleteMemo(authStore.currentUser.uid, id)
-    router.push({ name: 'memo-list' })
-  }
+  await memoStore.deleteMemo(authStore.currentUser.uid, id)
+  router.push({ name: 'memo-list' })
 }
 
 async function handleLogout() {
@@ -411,7 +409,8 @@ async function handleLogout() {
   border-radius: 10px;
   box-shadow: 0 4px 16px var(--app-shadow);
   z-index: 100;
-  min-width: 140px;
+  min-width: 160px;
+  white-space: nowrap;
   overflow: hidden;
 }
 

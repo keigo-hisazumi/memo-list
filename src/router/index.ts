@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import MemoView from '../views/MemoView.vue'
 import LoginView from '../views/LoginView.vue'
+import TrashView from '../views/TrashView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -22,6 +23,12 @@ const router = createRouter({
       path: '/memo/:id',
       name: 'memo-edit',
       component: MemoView,
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/trash',
+      name: 'trash',
+      component: TrashView,
       meta: { requiresAuth: true }
     },
   ],
