@@ -9,6 +9,7 @@ export interface Memo {
   updatedAt: Date
   category?: string
   isPinned?: boolean
+  deletedAt?: Date
 }
 
 /**
