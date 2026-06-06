@@ -409,7 +409,8 @@ async function handleLogout() {
   border-radius: 10px;
   box-shadow: 0 4px 16px var(--app-shadow);
   z-index: 100;
-  min-width: 140px;
+  min-width: 160px;
+  white-space: nowrap;
   overflow: hidden;
 }
 
