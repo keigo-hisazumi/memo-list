@@ -20,15 +20,17 @@
           type="text"
           class="title-input"
           placeholder="タイトル"
+          autocomplete="off"
           @keydown.enter.prevent="focusContent"
-          @input="handleUpdate"
+          @input="handleTitleUpdate"
         />
         <textarea
           ref="contentRef"
           v-model="localContent"
           class="content-textarea"
           placeholder="メモを入力..."
-          @input="handleUpdate"
+          autocomplete="off"
+          @input="handleContentUpdate"
           @keydown="handleContentKeydown"
         />
       </div>
@@ -44,7 +46,7 @@
             type="text"
             class="category-input"
             placeholder="タグを追加..."
-            @input="handleUpdate"
+            @input="handleCategoryUpdate"
           />
         </div>
       </div>
@@ -88,7 +90,7 @@ watch(() => props.memo?.id, () => {
 }, { immediate: true })
 
 function focusContent() {
-  nextTick(() => contentRef.value?.focus())
+  setTimeout(() => contentRef.value?.focus(), 0)
 }
 
 function handleContentKeydown(e: KeyboardEvent) {
@@ -103,13 +105,19 @@ function handleContentKeydown(e: KeyboardEvent) {
   }
 }
 
-function handleUpdate() {
+function handleTitleUpdate() {
   if (!props.memo) return
-  emit('update', props.memo.id, {
-    title: localTitle.value,
-    content: localContent.value,
-    category: localCategory.value || undefined
-  })
+  emit('update', props.memo.id, { title: localTitle.value })
+}
+
+function handleContentUpdate() {
+  if (!props.memo) return
+  emit('update', props.memo.id, { content: localContent.value })
+}
+
+function handleCategoryUpdate() {
+  if (!props.memo) return
+  emit('update', props.memo.id, { category: localCategory.value || undefined })
 }
 </script>
 
