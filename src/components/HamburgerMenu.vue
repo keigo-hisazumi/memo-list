@@ -50,6 +50,22 @@
 
         <div class="menu-divider"></div>
 
+        <!-- ゴミ箱 -->
+        <button class="menu-item" @click="handleTrash">
+          <span class="menu-item-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="3 6 5 6 21 6"/>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+            </svg>
+          </span>
+          <span>ゴミ箱</span>
+        </button>
+
+        <!-- スペーサー -->
+        <div class="menu-spacer"></div>
+
+        <div class="menu-divider"></div>
+
         <!-- テーマ切り替え -->
         <button class="menu-item" @click="handleThemeToggle">
           <span class="menu-item-icon">
@@ -69,19 +85,6 @@
             </svg>
           </span>
           <span>{{ themeStore.isDark ? 'ダークモード' : 'ライトモード' }}</span>
-        </button>
-
-        <div class="menu-divider"></div>
-
-        <!-- ゴミ箱 -->
-        <button class="menu-item" @click="handleTrash">
-          <span class="menu-item-icon">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="3 6 5 6 21 6"/>
-              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
-            </svg>
-          </span>
-          <span>ゴミ箱</span>
         </button>
 
         <div class="menu-divider"></div>
@@ -221,6 +224,7 @@ function handleLogout() {
   display: flex;
   flex-direction: column;
   overflow-y: auto;
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
 /* アカウント情報 */
@@ -257,6 +261,11 @@ function handleLogout() {
   border-radius: 50%;
   color: #ffffff;
   flex-shrink: 0;
+}
+
+/* スペーサー */
+.menu-spacer {
+  flex: 1;
 }
 
 /* 区切り線 */
