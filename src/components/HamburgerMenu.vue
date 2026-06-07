@@ -224,6 +224,7 @@ function handleLogout() {
   display: flex;
   flex-direction: column;
   overflow-y: auto;
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
 /* アカウント情報 */
@@ -311,11 +312,7 @@ function handleLogout() {
   color: var(--app-text-secondary);
 }
 
-/* ログアウトボタン（下部セーフエリア対応） */
-.logout-item {
-  padding-bottom: calc(0.9rem + env(safe-area-inset-bottom));
-}
-
+/* ログアウトボタン */
 .logout-item:hover {
   color: var(--app-logout-hover-text);
 }
