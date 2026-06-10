@@ -1,61 +1,68 @@
-<template>
-  <div class="memo-list">
-    <div v-if="memos.length === 0" class="empty-state">
-      <p>メモがありません</p>
-      <p class="empty-hint">右上のボタンでメモを追加しましょう</p>
-    </div>
-
-    <div v-else class="memo-items">
-      <div
-        v-for="memo in memos"
-        :key="memo.id"
-        :class="['memo-item', { active: selectedId === memo.id }]"
-        @click="$emit('select', memo.id)"
-      >
-        <div class="memo-item-inner">
-          <span v-if="memo.isPinned" class="pin-icon" aria-label="ピン留め">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M16 12V4h1V2H7v2h1v8l-2 2v2h5.2v6h1.6v-6H18v-2l-2-2z"/>
-            </svg>
-          </span>
-          <div class="memo-content">
-            <h3 class="memo-title">{{ memo.title || '無題のメモ' }}</h3>
-            <p class="memo-preview">{{ getPreview(memo.content) }}</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</template>
-
-<script setup lang="ts">
 import type { Memo } from '@/types/memo'
 
 interface Props {
   memos: Memo[]
   selectedId?: string | null
+  onSelect: (id: string) => void
 }
-
-defineProps<Props>()
-
-defineEmits<{
-  select: [id: string]
-}>()
 
 function getPreview(content: string, maxLength = 100): string {
   const stripped = content.replace(/\n/g, ' ').trim()
   if (stripped.length <= maxLength) return stripped
   return stripped.substring(0, maxLength) + '...'
 }
-</script>
 
-<style scoped>
+export default function MemoList({ memos, selectedId, onSelect }: Props) {
+  if (memos.length === 0) {
+    return (
+      <div className="memo-list">
+        <div className="empty-state">
+          <p>メモがありません</p>
+          <p className="empty-hint">右上のボタンでメモを追加しましょう</p>
+        </div>
+        <style>{styles}</style>
+      </div>
+    )
+  }
+
+  return (
+    <div className="memo-list">
+      <div className="memo-items">
+        {memos.map(memo => (
+          <div
+            key={memo.id}
+            className={`memo-item${selectedId === memo.id ? ' active' : ''}`}
+            onClick={() => onSelect(memo.id)}
+          >
+            <div className="memo-item-inner">
+              {memo.isPinned && (
+                <span className="pin-icon" aria-label="ピン留め">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M16 12V4h1V2H7v2h1v8l-2 2v2h5.2v6h1.6v-6H18v-2l-2-2z"/>
+                  </svg>
+                </span>
+              )}
+              <div className="memo-content">
+                <h3 className="memo-title">{memo.title || '無題のメモ'}</h3>
+                <p className="memo-preview">{getPreview(memo.content)}</p>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+      <style>{styles}</style>
+    </div>
+  )
+}
+
+const styles = `
 .memo-list {
   flex: 1;
   display: flex;
   flex-direction: column;
   background: var(--app-bg);
   transition: background 0.3s;
+  overflow-y: auto;
 }
 
 .empty-state {
@@ -137,4 +144,4 @@ function getPreview(content: string, maxLength = 100): string {
   overflow: hidden;
   transition: color 0.3s;
 }
-</style>
+`
