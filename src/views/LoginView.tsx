@@ -1,91 +1,10 @@
-<template>
-  <div class="login-page">
-    <div class="login-card">
-      <h1 class="app-title">MemoList</h1>
-      <h2 class="form-title">{{ isRegistering ? '新規登録' : 'ログイン' }}</h2>
-
-      <form @submit.prevent="handleSubmit" class="login-form">
-        <div class="form-group">
-          <label for="email">メールアドレス</label>
-          <input
-            id="email"
-            v-model="email"
-            type="email"
-            placeholder="example@email.com"
-            required
-            autocomplete="email"
-          />
-        </div>
-
-        <div class="form-group">
-          <label for="password">パスワード</label>
-          <input
-            id="password"
-            v-model="password"
-            type="password"
-            placeholder="6文字以上"
-            required
-            autocomplete="current-password"
-            minlength="6"
-          />
-        </div>
-
-        <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
-
-        <button type="submit" class="btn-submit" :disabled="isLoading">
-          <span v-if="isLoading" class="loading-spinner"></span>
-          {{ isRegistering ? '登録する' : 'ログイン' }}
-        </button>
-      </form>
-
-      <button @click="toggleMode" class="btn-toggle">
-        {{ isRegistering ? 'すでにアカウントをお持ちの方はこちら' : 'アカウントをお持ちでない方はこちら' }}
-      </button>
-    </div>
-  </div>
-</template>
-
-<script setup lang="ts">
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { useAuthStore } from '@/stores/auth'
-
-const router = useRouter()
-const authStore = useAuthStore()
-
-const email = ref('')
-const password = ref('')
-const isRegistering = ref(false)
-const isLoading = ref(false)
-const errorMessage = ref('')
-
-function toggleMode() {
-  isRegistering.value = !isRegistering.value
-  errorMessage.value = ''
-}
-
-async function handleSubmit() {
-  errorMessage.value = ''
-  isLoading.value = true
-
-  try {
-    if (isRegistering.value) {
-      await authStore.register(email.value, password.value)
-    } else {
-      await authStore.login(email.value, password.value)
-    }
-    router.push({ name: 'memo-list' })
-  } catch (e: unknown) {
-    errorMessage.value = getErrorMessage(e)
-  } finally {
-    isLoading.value = false
-  }
-}
+import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { useAuth } from '@/contexts/AuthContext'
 
 function getErrorMessage(e: unknown): string {
   if (typeof e === 'object' && e !== null && 'code' in e) {
-    const code = (e as { code: string }).code
-    switch (code) {
+    switch ((e as { code: string }).code) {
       case 'auth/user-not-found':
       case 'auth/wrong-password':
       case 'auth/invalid-credential':
@@ -98,15 +17,93 @@ function getErrorMessage(e: unknown): string {
         return 'メールアドレスの形式が正しくありません'
       case 'auth/too-many-requests':
         return 'しばらくしてから再度お試しください'
-      default:
-        return 'エラーが発生しました。もう一度お試しください'
     }
   }
   return 'エラーが発生しました。もう一度お試しください'
 }
-</script>
 
-<style scoped>
+export default function LoginView() {
+  const navigate = useNavigate()
+  const { register, login } = useAuth()
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [isRegistering, setIsRegistering] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const [errorMessage, setErrorMessage] = useState('')
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    setErrorMessage('')
+    setIsLoading(true)
+    try {
+      if (isRegistering) {
+        await register(email, password)
+      } else {
+        await login(email, password)
+      }
+      navigate('/')
+    } catch (err) {
+      setErrorMessage(getErrorMessage(err))
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  return (
+    <div className="login-page">
+      <div className="login-card">
+        <h1 className="app-title">MemoList</h1>
+        <h2 className="form-title">{isRegistering ? '新規登録' : 'ログイン'}</h2>
+
+        <form onSubmit={handleSubmit} className="login-form">
+          <div className="form-group">
+            <label htmlFor="email">メールアドレス</label>
+            <input
+              id="email"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              type="email"
+              placeholder="example@email.com"
+              required
+              autoComplete="email"
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="password">パスワード</label>
+            <input
+              id="password"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              type="password"
+              placeholder="6文字以上"
+              required
+              autoComplete="current-password"
+              minLength={6}
+            />
+          </div>
+
+          {errorMessage && <p className="error-message">{errorMessage}</p>}
+
+          <button type="submit" className="btn-submit" disabled={isLoading}>
+            {isLoading && <span className="loading-spinner"></span>}
+            {isRegistering ? '登録する' : 'ログイン'}
+          </button>
+        </form>
+
+        <button
+          onClick={() => { setIsRegistering(r => !r); setErrorMessage('') }}
+          className="btn-toggle"
+        >
+          {isRegistering ? 'すでにアカウントをお持ちの方はこちら' : 'アカウントをお持ちでない方はこちら'}
+        </button>
+      </div>
+      <style>{styles}</style>
+    </div>
+  )
+}
+
+const styles = `
 .login-page {
   display: flex;
   align-items: center;
@@ -238,4 +235,4 @@ function getErrorMessage(e: unknown): string {
 .btn-toggle:hover {
   color: #5a6fd6;
 }
-</style>
+`
