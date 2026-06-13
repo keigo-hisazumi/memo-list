@@ -30,6 +30,7 @@ interface ItemProps {
 
 function MemoListItem({ memo, active, isOpen, suppressClickRef, onSelect, onDelete, onOpen }: ItemProps) {
   const [offset, setOffset] = useState(0)
+  const [isDragging, setIsDragging] = useState(false)
   const startX = useRef(0)
   const startY = useRef(0)
   const startOffset = useRef(0)
@@ -37,7 +38,8 @@ function MemoListItem({ memo, active, isOpen, suppressClickRef, onSelect, onDele
   const swiped = useRef(false)
   const decided = useRef(false)
 
-  const translate = isOpen ? -DELETE_WIDTH : -offset
+  // Resting position is driven solely by isOpen; offset is only used mid-drag.
+  const translate = isDragging ? -offset : (isOpen ? -DELETE_WIDTH : 0)
 
   function handlePointerDown(e: PointerEvent<HTMLDivElement>) {
     if (e.pointerType === 'mouse') return
@@ -63,6 +65,7 @@ function MemoListItem({ memo, active, isOpen, suppressClickRef, onSelect, onDele
       }
       decided.current = true
       swiped.current = true
+      setIsDragging(true)
       e.currentTarget.setPointerCapture(e.pointerId)
     }
 
@@ -73,17 +76,17 @@ function MemoListItem({ memo, active, isOpen, suppressClickRef, onSelect, onDele
   }
 
   function endDrag() {
-    if (!dragging.current && !decided.current) return
+    if (!dragging.current) return
     dragging.current = false
+    setIsDragging(false)
     if (decided.current) {
       if (offset > OPEN_THRESHOLD) {
-        setOffset(DELETE_WIDTH)
         onOpen(memo.id)
-      } else {
-        setOffset(0)
-        if (isOpen) onOpen(null)
+      } else if (isOpen) {
+        onOpen(null)
       }
     }
+    setOffset(0)
   }
 
   function handleClick() {
@@ -122,7 +125,7 @@ function MemoListItem({ memo, active, isOpen, suppressClickRef, onSelect, onDele
         className={`memo-item${active ? ' active' : ''}`}
         style={{
           transform: `translateX(${translate}px)`,
-          transition: dragging.current ? 'none' : 'transform 0.2s ease'
+          transition: isDragging ? 'none' : 'transform 0.2s ease'
         }}
         onClick={handleClick}
         onPointerDown={handlePointerDown}
