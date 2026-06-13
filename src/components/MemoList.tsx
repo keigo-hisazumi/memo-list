@@ -1,4 +1,4 @@
-import { useRef, useState, type PointerEvent } from 'react'
+import { useEffect, useRef, useState, type MutableRefObject, type PointerEvent } from 'react'
 import type { Memo } from '@/types/memo'
 
 interface Props {
@@ -22,12 +22,13 @@ interface ItemProps {
   memo: Memo
   active: boolean
   isOpen: boolean
+  suppressClickRef: MutableRefObject<number>
   onSelect: (id: string) => void
   onDelete?: (id: string) => void
   onOpen: (id: string | null) => void
 }
 
-function MemoListItem({ memo, active, isOpen, onSelect, onDelete, onOpen }: ItemProps) {
+function MemoListItem({ memo, active, isOpen, suppressClickRef, onSelect, onDelete, onOpen }: ItemProps) {
   const [offset, setOffset] = useState(0)
   const startX = useRef(0)
   const startY = useRef(0)
@@ -90,6 +91,11 @@ function MemoListItem({ memo, active, isOpen, onSelect, onDelete, onOpen }: Item
       swiped.current = false
       return
     }
+    // A tap that just dismissed an open delete button should not also navigate.
+    if (Date.now() - suppressClickRef.current < 350) {
+      suppressClickRef.current = 0
+      return
+    }
     if (isOpen) {
       onOpen(null)
       return
@@ -98,7 +104,7 @@ function MemoListItem({ memo, active, isOpen, onSelect, onDelete, onOpen }: Item
   }
 
   return (
-    <div className={`memo-item-wrapper${isOpen ? ' open' : ''}`}>
+    <div className="memo-item-wrapper">
       <button
         type="button"
         className="memo-item-delete"
@@ -144,6 +150,25 @@ function MemoListItem({ memo, active, isOpen, onSelect, onDelete, onOpen }: Item
 
 export default function MemoList({ memos, selectedId, onSelect, onDelete }: Props) {
   const [openId, setOpenId] = useState<string | null>(null)
+  const suppressClickRef = useRef(0)
+
+  // Tapping anywhere outside the delete button retracts the revealed button.
+  useEffect(() => {
+    if (openId === null) return
+    function handleDocPointerDown(e: globalThis.PointerEvent) {
+      const target = e.target as HTMLElement | null
+      if (target?.closest('.memo-item-delete')) return
+      suppressClickRef.current = Date.now()
+      setOpenId(null)
+    }
+    document.addEventListener('pointerdown', handleDocPointerDown)
+    return () => document.removeEventListener('pointerdown', handleDocPointerDown)
+  }, [openId])
+
+  function handleDelete(id: string) {
+    setOpenId(null)
+    onDelete?.(id)
+  }
 
   if (memos.length === 0) {
     return (
@@ -159,13 +184,6 @@ export default function MemoList({ memos, selectedId, onSelect, onDelete }: Prop
 
   return (
     <div className="memo-list">
-      {openId !== null && (
-        <div
-          className="memo-swipe-overlay"
-          onClick={() => setOpenId(null)}
-          onPointerDown={() => setOpenId(null)}
-        />
-      )}
       <div className="memo-items">
         {memos.map(memo => (
           <MemoListItem
@@ -173,8 +191,9 @@ export default function MemoList({ memos, selectedId, onSelect, onDelete }: Prop
             memo={memo}
             active={selectedId === memo.id}
             isOpen={openId === memo.id}
+            suppressClickRef={suppressClickRef}
             onSelect={onSelect}
-            onDelete={onDelete}
+            onDelete={handleDelete}
             onOpen={setOpenId}
           />
         ))}
@@ -214,21 +233,10 @@ const styles = `
   flex-direction: column;
 }
 
-.memo-swipe-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 50;
-  background: transparent;
-}
-
 .memo-item-wrapper {
   position: relative;
   overflow: hidden;
   border-bottom: 1px solid var(--app-border);
-}
-
-.memo-item-wrapper.open {
-  z-index: 60;
 }
 
 .memo-item-wrapper:last-child {
