@@ -98,7 +98,7 @@ function MemoListItem({ memo, active, isOpen, onSelect, onDelete, onOpen }: Item
   }
 
   return (
-    <div className="memo-item-wrapper">
+    <div className={`memo-item-wrapper${isOpen ? ' open' : ''}`}>
       <button
         type="button"
         className="memo-item-delete"
@@ -159,6 +159,13 @@ export default function MemoList({ memos, selectedId, onSelect, onDelete }: Prop
 
   return (
     <div className="memo-list">
+      {openId !== null && (
+        <div
+          className="memo-swipe-overlay"
+          onClick={() => setOpenId(null)}
+          onPointerDown={() => setOpenId(null)}
+        />
+      )}
       <div className="memo-items">
         {memos.map(memo => (
           <MemoListItem
@@ -207,10 +214,21 @@ const styles = `
   flex-direction: column;
 }
 
+.memo-swipe-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: transparent;
+}
+
 .memo-item-wrapper {
   position: relative;
   overflow: hidden;
   border-bottom: 1px solid var(--app-border);
+}
+
+.memo-item-wrapper.open {
+  z-index: 60;
 }
 
 .memo-item-wrapper:last-child {
