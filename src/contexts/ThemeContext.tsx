@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react'
+import { resolveInitialTheme, applyThemeWithTransition } from '@/theme'
 
 interface ThemeContextValue {
   isDark: boolean
@@ -8,19 +9,11 @@ interface ThemeContextValue {
 const ThemeContext = createContext<ThemeContextValue | null>(null)
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [isDark, setIsDark] = useState(false)
+  // テーマは描画前に main.tsx で適用済みのため、初期値は同じ解決ロジックから取得する。
+  // これにより初期描画時のちらつき（FOUC）を防ぐ。
+  const [isDark, setIsDark] = useState(resolveInitialTheme)
 
   useEffect(() => {
-    const saved = localStorage.getItem('theme')
-    let dark: boolean
-    if (saved === 'dark' || saved === 'light') {
-      dark = saved === 'dark'
-    } else {
-      dark = window.matchMedia('(prefers-color-scheme: dark)').matches
-    }
-    setIsDark(dark)
-    applyTheme(dark)
-
     const mq = window.matchMedia('(prefers-color-scheme: dark)')
     function onSystemChange(e: MediaQueryListEvent) {
       if (!localStorage.getItem('theme')) {
@@ -31,24 +24,6 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     mq.addEventListener('change', onSystemChange)
     return () => mq.removeEventListener('change', onSystemChange)
   }, [])
-
-  function applyTheme(dark: boolean) {
-    if (dark) {
-      document.documentElement.classList.add('dark')
-      document.documentElement.classList.remove('light')
-    } else {
-      document.documentElement.classList.add('light')
-      document.documentElement.classList.remove('dark')
-    }
-  }
-
-  function applyThemeWithTransition(dark: boolean) {
-    document.documentElement.classList.add('theme-transitioning')
-    applyTheme(dark)
-    setTimeout(() => {
-      document.documentElement.classList.remove('theme-transitioning')
-    }, 400)
-  }
 
   function toggleTheme() {
     setIsDark(prev => {
