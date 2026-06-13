@@ -107,6 +107,7 @@ const styles = `
 .trash-app {
   display: flex;
   height: 100vh;
+  height: 100svh;
   overflow: hidden;
   background: var(--app-bg);
 }
@@ -173,7 +174,9 @@ const styles = `
 .trash-list {
   flex: 1;
   overflow-y: auto;
-  padding: 0.5rem 0;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+  padding: 0.5rem 0 calc(0.5rem + env(safe-area-inset-bottom, 0px));
 }
 
 .empty-state {

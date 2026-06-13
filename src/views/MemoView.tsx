@@ -225,6 +225,7 @@ const styles = `
 .memo-app {
   display: flex;
   height: 100vh;
+  height: 100svh;
   overflow: hidden;
   background: var(--app-bg);
 }

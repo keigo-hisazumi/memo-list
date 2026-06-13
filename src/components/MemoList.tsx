@@ -214,6 +214,9 @@ const styles = `
   background: var(--app-bg);
   transition: background 0.3s;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 .empty-state {
