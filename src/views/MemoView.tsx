@@ -25,6 +25,7 @@ export default function MemoView() {
   const [searchQuery, setSearchQuery] = useState('')
   const [showMenu, setShowMenu] = useState(false)
   const [showInfo, setShowInfo] = useState(false)
+  const [isDirty, setIsDirty] = useState(false)
   const [windowWidth, setWindowWidth] = useState(window.innerWidth)
 
   const isMobile = windowWidth < 768
@@ -146,6 +147,11 @@ export default function MemoView() {
           )}
 
           <div className="nav-actions">
+            {memoStore.selectedMemo && (
+              isDirty
+                ? <span className="editing-label">編集中</span>
+                : <span className="saved-label">保存済み</span>
+            )}
             <div className="nav-icon-wrap">
               <button
                 className="nav-icon-btn"
@@ -206,6 +212,7 @@ export default function MemoView() {
         <MemoEditor
           memo={memoStore.selectedMemo}
           onUpdate={handleUpdateMemo}
+          onDirtyChange={setIsDirty}
         />
       </div>
 
@@ -341,6 +348,18 @@ const styles = `
   display: flex;
   align-items: center;
   gap: 0.1rem;
+}
+
+.saved-label {
+  font-size: 0.8rem;
+  color: #10b981;
+  margin-right: 0.3rem;
+}
+
+.editing-label {
+  font-size: 0.8rem;
+  color: #f59e0b;
+  margin-right: 0.3rem;
 }
 
 .nav-icon-wrap {

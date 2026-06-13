@@ -4,16 +4,60 @@ import type { Memo } from '@/types/memo'
 interface Props {
   memo: Memo | null
   onUpdate: (id: string, data: { title?: string; content?: string; category?: string }) => void
+  /** 保存待ち（編集中）かどうかが変化したときに呼ばれる */
+  onDirtyChange?: (dirty: boolean) => void
 }
 
-export default function MemoEditor({ memo, onUpdate }: Props) {
+type MemoUpdate = { title?: string; content?: string; category?: string }
+
+// 入力が落ち着いてから Firestore へ書き込むまでの待機時間（ミリ秒）
+const SAVE_DEBOUNCE_MS = 600
+
+export default function MemoEditor({ memo, onUpdate, onDirtyChange }: Props) {
   const [localTitle, setLocalTitle] = useState('')
   const [localContent, setLocalContent] = useState('')
   const [localCategory, setLocalCategory] = useState('')
   const titleRef = useRef<HTMLInputElement>(null)
   const contentRef = useRef<HTMLTextAreaElement>(null)
 
+  // 最新の onUpdate / onDirtyChange を参照しつつ、保存待ちの編集内容を
+  // デバウンスして書き込む。キーストロークごとの Firestore 書き込みを
+  // 抑えつつ自動保存の体験を保つ。
+  const onUpdateRef = useRef(onUpdate)
+  const onDirtyChangeRef = useRef(onDirtyChange)
+  const pendingRef = useRef<{ id: string; data: MemoUpdate } | null>(null)
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
   useEffect(() => {
+    onUpdateRef.current = onUpdate
+    onDirtyChangeRef.current = onDirtyChange
+  })
+
+  function flush() {
+    if (timerRef.current) {
+      clearTimeout(timerRef.current)
+      timerRef.current = null
+    }
+    const pending = pendingRef.current
+    if (pending) {
+      pendingRef.current = null
+      onUpdateRef.current(pending.id, pending.data)
+      onDirtyChangeRef.current?.(false)
+    }
+  }
+
+  function scheduleUpdate(id: string, data: MemoUpdate) {
+    const prev = pendingRef.current?.id === id ? pendingRef.current.data : {}
+    pendingRef.current = { id, data: { ...prev, ...data } }
+    onDirtyChangeRef.current?.(true)
+    if (timerRef.current) clearTimeout(timerRef.current)
+    timerRef.current = setTimeout(flush, SAVE_DEBOUNCE_MS)
+  }
+
+  useEffect(() => {
+    // メモ切り替え前に、保存待ちの編集内容を確定させる
+    flush()
+    onDirtyChangeRef.current?.(false)
     if (memo) {
       setLocalTitle(memo.title)
       setLocalContent(memo.content)
@@ -24,6 +68,9 @@ export default function MemoEditor({ memo, onUpdate }: Props) {
       setLocalCategory('')
     }
   }, [memo?.id])
+
+  // アンマウント時に保存待ちの編集内容を確定させる
+  useEffect(() => () => flush(), [])
 
   function focusContent() {
     setTimeout(() => contentRef.current?.focus(), 0)
@@ -73,7 +120,7 @@ export default function MemoEditor({ memo, onUpdate }: Props) {
           onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); focusContent() } }}
           onChange={e => {
             setLocalTitle(e.target.value)
-            onUpdate(memo.id, { title: e.target.value })
+            scheduleUpdate(memo.id, { title: e.target.value })
           }}
         />
         <textarea
@@ -84,7 +131,7 @@ export default function MemoEditor({ memo, onUpdate }: Props) {
           autoComplete="off"
           onChange={e => {
             setLocalContent(e.target.value)
-            onUpdate(memo.id, { content: e.target.value })
+            scheduleUpdate(memo.id, { content: e.target.value })
           }}
           onKeyDown={handleContentKeydown}
         />
@@ -103,7 +150,7 @@ export default function MemoEditor({ memo, onUpdate }: Props) {
             placeholder="タグを追加..."
             onChange={e => {
               setLocalCategory(e.target.value)
-              onUpdate(memo.id, { category: e.target.value || undefined })
+              scheduleUpdate(memo.id, { category: e.target.value || undefined })
             }}
           />
         </div>

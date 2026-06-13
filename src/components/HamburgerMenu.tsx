@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '@/contexts/AuthContext'
 import { useTheme } from '@/contexts/ThemeContext'
+import { useMemo2 } from '@/contexts/MemoContext'
 
 interface Props {
   onLogout: () => void
@@ -12,6 +13,8 @@ export default function HamburgerMenu({ onLogout }: Props) {
   const navigate = useNavigate()
   const { currentUser } = useAuth()
   const { isDark, toggleTheme } = useTheme()
+  // ゴミ箱の件数バッジ（markdown-editer のドロワーから取り込み）
+  const trashCount = useMemo2().sortedTrashMemos.length
 
   function closeMenu() { setIsOpen(false) }
 
@@ -82,6 +85,7 @@ export default function HamburgerMenu({ onLogout }: Props) {
             </svg>
           </span>
           <span>ゴミ箱</span>
+          {trashCount > 0 && <span className="menu-badge">{trashCount}</span>}
         </button>
 
         <div className="menu-spacer"></div>
@@ -295,6 +299,22 @@ const styles = `
 
 .menu-item:hover .menu-item-icon {
   color: var(--app-text-secondary);
+}
+
+.menu-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  margin-left: auto;
+  background: #e5484d;
+  color: #fff;
+  border-radius: 9px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  line-height: 1;
 }
 
 .logout-item:hover {
