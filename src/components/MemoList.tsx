@@ -1,10 +1,16 @@
+import { useRef, useState, type PointerEvent } from 'react'
 import type { Memo } from '@/types/memo'
 
 interface Props {
   memos: Memo[]
   selectedId?: string | null
   onSelect: (id: string) => void
+  onDelete?: (id: string) => void
 }
+
+const DELETE_WIDTH = 88
+const OPEN_THRESHOLD = 40
+const SWIPE_TRIGGER = 8
 
 function getPreview(content: string, maxLength = 100): string {
   const stripped = content.replace(/\n/g, ' ').trim()
@@ -12,7 +18,133 @@ function getPreview(content: string, maxLength = 100): string {
   return stripped.substring(0, maxLength) + '...'
 }
 
-export default function MemoList({ memos, selectedId, onSelect }: Props) {
+interface ItemProps {
+  memo: Memo
+  active: boolean
+  isOpen: boolean
+  onSelect: (id: string) => void
+  onDelete?: (id: string) => void
+  onOpen: (id: string | null) => void
+}
+
+function MemoListItem({ memo, active, isOpen, onSelect, onDelete, onOpen }: ItemProps) {
+  const [offset, setOffset] = useState(0)
+  const startX = useRef(0)
+  const startY = useRef(0)
+  const startOffset = useRef(0)
+  const dragging = useRef(false)
+  const swiped = useRef(false)
+  const decided = useRef(false)
+
+  const translate = isOpen ? -DELETE_WIDTH : -offset
+
+  function handlePointerDown(e: PointerEvent<HTMLDivElement>) {
+    if (e.pointerType === 'mouse') return
+    startX.current = e.clientX
+    startY.current = e.clientY
+    startOffset.current = isOpen ? DELETE_WIDTH : 0
+    dragging.current = true
+    swiped.current = false
+    decided.current = false
+  }
+
+  function handlePointerMove(e: PointerEvent<HTMLDivElement>) {
+    if (!dragging.current) return
+    const dx = e.clientX - startX.current
+    const dy = e.clientY - startY.current
+
+    if (!decided.current) {
+      if (Math.abs(dx) < SWIPE_TRIGGER && Math.abs(dy) < SWIPE_TRIGGER) return
+      // Decide gesture direction: vertical scroll vs horizontal swipe
+      if (Math.abs(dy) > Math.abs(dx)) {
+        dragging.current = false
+        return
+      }
+      decided.current = true
+      swiped.current = true
+      e.currentTarget.setPointerCapture(e.pointerId)
+    }
+
+    let next = startOffset.current - dx
+    if (next < 0) next = 0
+    if (next > DELETE_WIDTH + 40) next = DELETE_WIDTH + 40
+    setOffset(next)
+  }
+
+  function endDrag() {
+    if (!dragging.current && !decided.current) return
+    dragging.current = false
+    if (decided.current) {
+      if (offset > OPEN_THRESHOLD) {
+        setOffset(DELETE_WIDTH)
+        onOpen(memo.id)
+      } else {
+        setOffset(0)
+        if (isOpen) onOpen(null)
+      }
+    }
+  }
+
+  function handleClick() {
+    if (swiped.current) {
+      swiped.current = false
+      return
+    }
+    if (isOpen) {
+      onOpen(null)
+      return
+    }
+    onSelect(memo.id)
+  }
+
+  return (
+    <div className="memo-item-wrapper">
+      <button
+        type="button"
+        className="memo-item-delete"
+        style={{ width: DELETE_WIDTH }}
+        onClick={e => { e.stopPropagation(); onDelete?.(memo.id) }}
+        aria-label="削除"
+      >
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <polyline points="3 6 5 6 21 6" />
+          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+        </svg>
+        <span>削除</span>
+      </button>
+      <div
+        className={`memo-item${active ? ' active' : ''}`}
+        style={{
+          transform: `translateX(${translate}px)`,
+          transition: dragging.current ? 'none' : 'transform 0.2s ease'
+        }}
+        onClick={handleClick}
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={endDrag}
+        onPointerCancel={endDrag}
+      >
+        <div className="memo-item-inner">
+          {memo.isPinned && (
+            <span className="pin-icon" aria-label="ピン留め">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M16 12V4h1V2H7v2h1v8l-2 2v2h5.2v6h1.6v-6H18v-2l-2-2z" />
+              </svg>
+            </span>
+          )}
+          <div className="memo-content">
+            <h3 className="memo-title">{memo.title || '無題のメモ'}</h3>
+            <p className="memo-preview">{getPreview(memo.content)}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export default function MemoList({ memos, selectedId, onSelect, onDelete }: Props) {
+  const [openId, setOpenId] = useState<string | null>(null)
+
   if (memos.length === 0) {
     return (
       <div className="memo-list">
@@ -29,25 +161,15 @@ export default function MemoList({ memos, selectedId, onSelect }: Props) {
     <div className="memo-list">
       <div className="memo-items">
         {memos.map(memo => (
-          <div
+          <MemoListItem
             key={memo.id}
-            className={`memo-item${selectedId === memo.id ? ' active' : ''}`}
-            onClick={() => onSelect(memo.id)}
-          >
-            <div className="memo-item-inner">
-              {memo.isPinned && (
-                <span className="pin-icon" aria-label="ピン留め">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M16 12V4h1V2H7v2h1v8l-2 2v2h5.2v6h1.6v-6H18v-2l-2-2z"/>
-                  </svg>
-                </span>
-              )}
-              <div className="memo-content">
-                <h3 className="memo-title">{memo.title || '無題のメモ'}</h3>
-                <p className="memo-preview">{getPreview(memo.content)}</p>
-              </div>
-            </div>
-          </div>
+            memo={memo}
+            active={selectedId === memo.id}
+            isOpen={openId === memo.id}
+            onSelect={onSelect}
+            onDelete={onDelete}
+            onOpen={setOpenId}
+          />
         ))}
       </div>
       <style>{styles}</style>
@@ -85,16 +207,42 @@ const styles = `
   flex-direction: column;
 }
 
-.memo-item {
-  background: var(--app-bg);
-  cursor: pointer;
+.memo-item-wrapper {
+  position: relative;
+  overflow: hidden;
   border-bottom: 1px solid var(--app-border);
-  transition: background 0.15s;
+}
+
+.memo-item-wrapper:last-child {
+  border-bottom: none;
+}
+
+.memo-item-delete {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.15rem;
+  border: none;
+  background: #e5484d;
+  color: #fff;
+  font-size: 0.78rem;
+  font-family: inherit;
+  cursor: pointer;
   -webkit-tap-highlight-color: transparent;
 }
 
-.memo-item:last-child {
-  border-bottom: none;
+.memo-item {
+  position: relative;
+  background: var(--app-bg);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: pan-y;
+  will-change: transform;
 }
 
 .memo-item:active,

@@ -63,6 +63,12 @@ export default function MemoView() {
     navigate(`/memo/${memoId}`)
   }
 
+  async function handleDeleteFromList(memoId: string) {
+    if (!currentUser) return
+    await memoStore.deleteMemo(currentUser.uid, memoId)
+    if (id === memoId) navigate('/')
+  }
+
   async function handleUpdateMemo(memoId: string, data: { title?: string; content?: string; category?: string }) {
     if (!currentUser) return
     await memoStore.updateMemo(currentUser.uid, memoId, data)
@@ -121,6 +127,7 @@ export default function MemoView() {
           memos={filteredMemos}
           selectedId={memoStore.selectedMemoId}
           onSelect={handleSelectMemo}
+          onDelete={handleDeleteFromList}
         />
       </div>
 
