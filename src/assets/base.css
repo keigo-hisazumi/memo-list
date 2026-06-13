@@ -201,6 +201,17 @@
   background: transparent;
 }
 
+/* ページ全体のスクロールを抑止し、ヘッダーが固定されるようにする。
+   スクロールは各エリア内部（一覧・エディタ）にのみ発生させる。 */
+html {
+  height: 100%;
+  overflow: hidden;
+}
+
+#app {
+  height: 100%;
+}
+
 *,
 *::before,
 *::after {
@@ -224,7 +235,8 @@ html.theme-transitioning *::after {
 }
 
 body {
-  min-height: 100vh;
+  height: 100%;
+  overflow: hidden;
   color: var(--color-text);
   background: var(--color-background);
   transition:
