@@ -286,6 +286,10 @@ const styles = `
     align-items: flex-start;
   }
 
+  .trash-item-body {
+    width: 100%;
+  }
+
   .trash-item-actions {
     align-self: flex-end;
   }
