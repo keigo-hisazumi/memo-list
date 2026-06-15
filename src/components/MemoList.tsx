@@ -318,10 +318,9 @@ const styles = `
   font-size: 0.82rem;
   color: var(--app-text-secondary);
   line-height: 1.45;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
+  white-space: nowrap;
   overflow: hidden;
+  text-overflow: ellipsis;
   transition: color 0.3s;
 }
 `
