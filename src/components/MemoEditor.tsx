@@ -72,10 +72,6 @@ export default function MemoEditor({ memo, onUpdate, onDirtyChange }: Props) {
   // アンマウント時に保存待ちの編集内容を確定させる
   useEffect(() => () => flush(), [])
 
-  function focusContent() {
-    setTimeout(() => contentRef.current?.focus(), 0)
-  }
-
   function handleContentKeydown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
     if (e.key === 'Backspace') {
       const textarea = e.currentTarget
@@ -117,7 +113,7 @@ export default function MemoEditor({ memo, onUpdate, onDirtyChange }: Props) {
           className="title-input"
           placeholder="タイトル"
           autoComplete="off"
-          onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); focusContent() } }}
+          onKeyDown={e => { if (e.key === 'Enter') e.preventDefault() }}
           onChange={e => {
             setLocalTitle(e.target.value)
             scheduleUpdate(memo.id, { title: e.target.value })
