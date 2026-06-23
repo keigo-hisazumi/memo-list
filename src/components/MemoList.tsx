@@ -285,7 +285,7 @@ const styles = `
 .memo-item-inner {
   display: flex;
   align-items: flex-start;
-  gap: 0.5rem;
+  gap: 0.25rem;
   padding: 0.85rem 1rem;
 }
 
