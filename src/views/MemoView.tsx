@@ -502,18 +502,5 @@ const styles = `
     transform: translateX(-50%);
   }
 
-  /* キーボード表示中もヘッダーを画面上部に固定する */
-  .editor-nav {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 200;
-  }
-
-  /* 固定ヘッダー分の高さを確保する */
-  .memo-main {
-    padding-top: 52px;
-  }
 }
 `
