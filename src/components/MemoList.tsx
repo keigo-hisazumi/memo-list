@@ -286,7 +286,7 @@ const styles = `
   display: flex;
   align-items: flex-start;
   gap: 0.25rem;
-  padding: 0.85rem 1rem;
+  padding: 0.425rem 0.5rem;
 }
 
 .pin-icon {
