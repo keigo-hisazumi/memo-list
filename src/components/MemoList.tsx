@@ -134,13 +134,13 @@ function MemoListItem({ memo, active, isOpen, suppressClickRef, onSelect, onDele
         onPointerCancel={endDrag}
       >
         <div className="memo-item-inner">
-          {memo.isPinned && (
-            <span className="pin-icon" aria-label="ピン留め">
+          <span className="pin-icon" aria-label={memo.isPinned ? 'ピン留め' : undefined}>
+            {memo.isPinned && (
               <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M16 12V4h1V2H7v2h1v8l-2 2v2h5.2v6h1.6v-6H18v-2l-2-2z" />
               </svg>
-            </span>
-          )}
+            )}
+          </span>
           <div className="memo-content">
             <h3 className="memo-title">{memo.title || '無題のメモ'}</h3>
             <p className="memo-preview">{getPreview(memo.content)}</p>
@@ -285,16 +285,18 @@ const styles = `
 .memo-item-inner {
   display: flex;
   align-items: flex-start;
-  gap: 0.5rem;
-  padding: 0.85rem 1rem;
+  gap: 0.25rem;
+  padding: 0.425rem 0.5rem;
 }
 
 .pin-icon {
   color: #667eea;
   flex-shrink: 0;
+  width: 16px;
   margin-top: 2px;
   display: flex;
   align-items: center;
+  justify-content: center;
 }
 
 .memo-content {

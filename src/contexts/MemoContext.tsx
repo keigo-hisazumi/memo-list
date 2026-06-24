@@ -147,11 +147,16 @@ export function MemoProvider({ children }: { children: ReactNode }) {
 
   async function updateMemo(userId: string, id: string, input: UpdateMemoInput): Promise<void> {
     const ref = doc(db, 'users', userId, 'memos', id)
-    const data: Record<string, unknown> = { updatedAt: Timestamp.now() }
+    const data: Record<string, unknown> = {}
     if (input.title !== undefined) data.title = input.title
     if (input.content !== undefined) data.content = input.content
     if ('category' in input) {
       data.category = input.category !== undefined ? input.category : deleteField()
+    }
+    if (input.isPinned !== undefined) data.isPinned = input.isPinned
+    // ピン留めの切り替えだけでは更新日時を変えない（内容変更時のみ更新）
+    if (input.title !== undefined || input.content !== undefined || 'category' in input) {
+      data.updatedAt = Timestamp.now()
     }
     await updateDoc(ref, data)
   }
