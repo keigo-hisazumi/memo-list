@@ -50,6 +50,32 @@ export default function MemoView() {
     }
   }, [])
 
+  // iOS/Capacitorのキーボード表示でウィンドウがスクロールする問題を防ぐ
+  useEffect(() => {
+    const vv = window.visualViewport
+
+    function lockScroll() {
+      if (window.scrollY !== 0) window.scrollTo(0, 0)
+    }
+
+    function updateAppHeight() {
+      const h = vv?.height ?? window.innerHeight
+      document.documentElement.style.setProperty('--app-height', `${h}px`)
+      lockScroll()
+    }
+
+    updateAppHeight()
+    window.addEventListener('scroll', lockScroll, { passive: true })
+    vv?.addEventListener('resize', updateAppHeight)
+    vv?.addEventListener('scroll', lockScroll)
+
+    return () => {
+      window.removeEventListener('scroll', lockScroll)
+      vv?.removeEventListener('resize', updateAppHeight)
+      vv?.removeEventListener('scroll', lockScroll)
+    }
+  }, [])
+
   useEffect(() => {
     memoStore.selectMemo(id ?? null)
   }, [id])
@@ -253,6 +279,7 @@ const styles = `
   display: flex;
   height: 100vh;
   height: 100svh;
+  height: var(--app-height, 100svh);
   overflow: hidden;
   background: var(--app-bg);
 }
@@ -502,5 +529,18 @@ const styles = `
     transform: translateX(-50%);
   }
 
+  /* キーボード表示時のスクロールの影響を受けないようにナビゲーションバーを固定 */
+  .editor-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 200;
+  }
+
+  /* 固定ナビゲーションバー分のスペースを確保 */
+  .memo-main {
+    padding-top: 52px;
+  }
 }
 `

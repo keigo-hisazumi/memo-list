@@ -105,20 +105,20 @@ export default function MemoEditor({ memo, onUpdate, onDirtyChange }: Props) {
 
   return (
     <div className="memo-editor">
-      <input
-        ref={titleRef}
-        value={localTitle}
-        type="text"
-        className="title-input"
-        placeholder="タイトル"
-        autoComplete="off"
-        onKeyDown={e => { if (e.key === 'Enter') e.preventDefault() }}
-        onChange={e => {
-          setLocalTitle(e.target.value)
-          scheduleUpdate(memo.id, { title: e.target.value })
-        }}
-      />
       <div className="editor-scroll">
+        <input
+          ref={titleRef}
+          value={localTitle}
+          type="text"
+          className="title-input"
+          placeholder="タイトル"
+          autoComplete="off"
+          onKeyDown={e => { if (e.key === 'Enter') e.preventDefault() }}
+          onChange={e => {
+            setLocalTitle(e.target.value)
+            scheduleUpdate(memo.id, { title: e.target.value })
+          }}
+        />
         <textarea
           ref={contentRef}
           value={localContent}
@@ -194,7 +194,7 @@ const styles = `
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior-y: contain;
-  padding: 0 1.25rem 0.5rem;
+  padding: 0.75rem 1.25rem 0.5rem;
   display: flex;
   flex-direction: column;
 }
@@ -205,13 +205,13 @@ const styles = `
   font-weight: 700;
   border: none;
   outline: none;
-  padding: 0.75rem 1.25rem 0.5rem;
+  padding: 0;
+  margin-bottom: 0.5rem;
   color: var(--app-text);
   background: transparent;
   line-height: 1.3;
   font-family: inherit;
   transition: color 0.3s;
-  flex-shrink: 0;
 }
 
 .title-input::placeholder {
