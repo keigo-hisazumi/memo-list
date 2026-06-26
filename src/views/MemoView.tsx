@@ -50,29 +50,20 @@ export default function MemoView() {
     }
   }, [])
 
-  // iOS/Capacitorのキーボード表示でウィンドウがスクロールする問題を防ぐ
+  // iOS/Capacitorのキーボード表示でビューポート高さが変わる場合にアプリ高さを追従させる
   useEffect(() => {
     const vv = window.visualViewport
-
-    function lockScroll() {
-      if (window.scrollY !== 0) window.scrollTo(0, 0)
-    }
+    if (!vv) return
 
     function updateAppHeight() {
-      const h = vv?.height ?? window.innerHeight
-      document.documentElement.style.setProperty('--app-height', `${h}px`)
-      lockScroll()
+      document.documentElement.style.setProperty('--app-height', `${vv!.height}px`)
     }
 
     updateAppHeight()
-    window.addEventListener('scroll', lockScroll, { passive: true })
-    vv?.addEventListener('resize', updateAppHeight)
-    vv?.addEventListener('scroll', lockScroll)
+    vv.addEventListener('resize', updateAppHeight)
 
     return () => {
-      window.removeEventListener('scroll', lockScroll)
-      vv?.removeEventListener('resize', updateAppHeight)
-      vv?.removeEventListener('scroll', lockScroll)
+      vv.removeEventListener('resize', updateAppHeight)
     }
   }, [])
 
