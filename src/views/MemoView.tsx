@@ -51,19 +51,24 @@ export default function MemoView() {
   }, [])
 
   // iOS/Capacitorのキーボード表示でビューポート高さが変わる場合にアプリ高さを追従させる
+  // visualViewport.offsetTopでビジュアルビューポートのオフセットを追跡し、
+  // fixed要素がレイアウトビューポート基準ではなくビジュアルビューポート基準になるよう補正する
   useEffect(() => {
     const vv = window.visualViewport
     if (!vv) return
 
-    function updateAppHeight() {
+    function onViewportChange() {
       document.documentElement.style.setProperty('--app-height', `${vv!.height}px`)
+      document.documentElement.style.setProperty('--vv-offset-top', `${vv!.offsetTop}px`)
     }
 
-    updateAppHeight()
-    vv.addEventListener('resize', updateAppHeight)
+    onViewportChange()
+    vv.addEventListener('resize', onViewportChange)
+    vv.addEventListener('scroll', onViewportChange)
 
     return () => {
-      vv.removeEventListener('resize', updateAppHeight)
+      vv.removeEventListener('resize', onViewportChange)
+      vv.removeEventListener('scroll', onViewportChange)
     }
   }, [])
 
@@ -520,10 +525,10 @@ const styles = `
     transform: translateX(-50%);
   }
 
-  /* キーボード表示時のスクロールの影響を受けないようにナビゲーションバーを固定 */
+  /* キーボード表示時のビジュアルビューポートオフセットに追従させてナビゲーションバーを常時表示 */
   .editor-nav {
     position: fixed;
-    top: 0;
+    top: var(--vv-offset-top, 0px);
     left: 0;
     right: 0;
     z-index: 200;
