@@ -199,12 +199,11 @@ const styles = `
 
 .editor-scroll {
   flex: 1;
+  min-height: 0;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior-y: contain;
   padding: 0.75rem 1.25rem 0.5rem;
-  display: flex;
-  flex-direction: column;
 }
 
 .title-input {
