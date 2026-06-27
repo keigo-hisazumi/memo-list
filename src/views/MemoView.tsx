@@ -501,6 +501,17 @@ const styles = `
 }
 
 @media (max-width: 767px) {
+  /* キーボード表示時にビジュアルビューポートへ追従させる
+     position:fixed にすることで子要素の position:absolute の基準となり、
+     スクロール領域がビジュアルビューポート高に正しく収まる */
+  .memo-app {
+    position: fixed;
+    top: var(--vv-offset-top, 0px);
+    left: 0;
+    right: 0;
+    height: var(--app-height, 100svh);
+  }
+
   .memo-sidebar,
   .memo-main {
     position: absolute;
@@ -523,20 +534,6 @@ const styles = `
   .app-title {
     left: 50%;
     transform: translateX(-50%);
-  }
-
-  /* キーボード表示時のビジュアルビューポートオフセットに追従させてナビゲーションバーを常時表示 */
-  .editor-nav {
-    position: fixed;
-    top: var(--vv-offset-top, 0px);
-    left: 0;
-    right: 0;
-    z-index: 200;
-  }
-
-  /* 固定ナビゲーションバー分のスペースを確保 */
-  .memo-main {
-    padding-top: 52px;
   }
 }
 `
