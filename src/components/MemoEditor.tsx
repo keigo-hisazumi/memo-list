@@ -72,6 +72,14 @@ export default function MemoEditor({ memo, onUpdate, onDirtyChange }: Props) {
   // アンマウント時に保存待ちの編集内容を確定させる
   useEffect(() => () => flush(), [])
 
+  // テキストエリアを内容に合わせて伸縮させ、タイトルと本文が同一スクロール領域で動くようにする
+  useEffect(() => {
+    const ta = contentRef.current
+    if (!ta) return
+    ta.style.height = 'auto'
+    ta.style.height = `${ta.scrollHeight}px`
+  }, [localContent])
+
   function handleContentKeydown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
     if (e.key === 'Backspace') {
       const textarea = e.currentTarget
@@ -219,15 +227,15 @@ const styles = `
 }
 
 .content-textarea {
-  flex: 1;
-  min-height: 300px;
   width: 100%;
+  min-height: 200px;
   border: none;
   outline: none;
   font-size: 1rem;
   font-family: inherit;
   line-height: 1.7;
   resize: none;
+  overflow-y: hidden;
   color: var(--app-text);
   background: transparent;
   transition: color 0.3s;
