@@ -50,6 +50,28 @@ export default function MemoView() {
     }
   }, [])
 
+  // iOS/Capacitorのキーボード表示でビューポート高さが変わる場合にアプリ高さを追従させる
+  // visualViewport.offsetTopでビジュアルビューポートのオフセットを追跡し、
+  // fixed要素がレイアウトビューポート基準ではなくビジュアルビューポート基準になるよう補正する
+  useEffect(() => {
+    const vv = window.visualViewport
+    if (!vv) return
+
+    function onViewportChange() {
+      document.documentElement.style.setProperty('--app-height', `${vv!.height}px`)
+      document.documentElement.style.setProperty('--vv-offset-top', `${vv!.offsetTop}px`)
+    }
+
+    onViewportChange()
+    vv.addEventListener('resize', onViewportChange)
+    vv.addEventListener('scroll', onViewportChange)
+
+    return () => {
+      vv.removeEventListener('resize', onViewportChange)
+      vv.removeEventListener('scroll', onViewportChange)
+    }
+  }, [])
+
   useEffect(() => {
     memoStore.selectMemo(id ?? null)
   }, [id])
@@ -253,6 +275,7 @@ const styles = `
   display: flex;
   height: 100vh;
   height: 100svh;
+  height: var(--app-height, 100svh);
   overflow: hidden;
   background: var(--app-bg);
 }
@@ -478,6 +501,17 @@ const styles = `
 }
 
 @media (max-width: 767px) {
+  /* キーボード表示時にビジュアルビューポートへ追従させる
+     position:fixed にすることで子要素の position:absolute の基準となり、
+     スクロール領域がビジュアルビューポート高に正しく収まる */
+  .memo-app {
+    position: fixed;
+    top: var(--vv-offset-top, 0px);
+    left: 0;
+    right: 0;
+    height: var(--app-height, 100svh);
+  }
+
   .memo-sidebar,
   .memo-main {
     position: absolute;
