@@ -69,6 +69,16 @@ export default function MemoEditor({ memo, onUpdate, onDirtyChange }: Props) {
     }
   }, [memo?.id])
 
+  // 別デバイスでの更新をリアルタイムに反映する。ただし保存待ちの
+  // ローカル編集（pendingRef）がある間はユーザーの入力を上書きしない。
+  useEffect(() => {
+    if (!memo) return
+    if (pendingRef.current?.id === memo.id) return
+    setLocalTitle(memo.title)
+    setLocalContent(memo.content)
+    setLocalCategory(memo.category || '')
+  }, [memo?.id, memo?.title, memo?.content, memo?.category])
+
   // アンマウント時に保存待ちの編集内容を確定させる
   useEffect(() => () => flush(), [])
 
