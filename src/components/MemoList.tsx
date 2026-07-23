@@ -268,6 +268,15 @@ const styles = `
   -webkit-tap-highlight-color: transparent;
 }
 
+/* Swipe-to-delete is a touch-only gesture (see handlePointerDown), so on
+   PC the button is unreachable and only risks peeking out past the row's
+   right edge as a red sliver. Hide it for mouse/trackpad pointers. */
+@media (hover: hover) and (pointer: fine) {
+  .memo-item-delete {
+    display: none;
+  }
+}
+
 .memo-item {
   position: relative;
   background: var(--app-bg);
