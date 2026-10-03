@@ -42,3 +42,9 @@ __screenshots__/
 android/
 ios/
 .capacitor/
+
+# 環境変数 / 機密情報
+.env
+.env.*
+!.env.example
+.envrc
