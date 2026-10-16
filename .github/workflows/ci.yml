@@ -1,12 +1,17 @@
 # CI ワークフロー
 #
-# Node.js / npm プロジェクト向けの標準 CI パイプラインです。
+# template リポジトリの CI と同じ構成（lint → type-check / test → build）で、
+# このリポジトリの package.json にあるスクリプトだけを実行します。
 
 name: CI
 
 on:
   pull_request:
     types: [opened, synchronize, reopened]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: read
