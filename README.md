@@ -5,7 +5,7 @@ iOS、Android、Webで動作します。
 
 ## デモ
 
-🌐 **GitHub Pages**: https://keigo-hisazumi.github.io/memo-list/
+🌐 **GitHub Pages**: <https://keigo-hisazumi.github.io/memo-list/>
 
 mainブランチへのプッシュ時に自動的にGitHub Pagesにデプロイされます。
 
@@ -23,15 +23,19 @@ mainブランチへのプッシュ時に自動的にGitHub Pagesにデプロイ�
 ## スクリーンショット
 
 ### デスクトップ表示
+
 ![メモ一覧](https://github.com/user-attachments/assets/fdc0e6cb-6206-4400-ae83-723c16a8a294)
 
 ### メモ編集
+
 ![メモ編集](https://github.com/user-attachments/assets/320b5eb4-2ed5-47d7-b107-76aba5b169a8)
 
 ### 新規メモ作成
+
 ![新規作成](https://github.com/user-attachments/assets/9d33894f-3916-4273-bed5-e4c1269689f5)
 
 ### モバイル表示
+
 ![モバイル](https://github.com/user-attachments/assets/cc272164-18e1-4c94-95ad-d77cd6746eb0)
 
 ## 技術スタック
@@ -102,13 +106,15 @@ PR 作成時は GitHub Actions の CI（Lint / 型チェック / ビルド）が
 このプロジェクトは、mainブランチへのプッシュ時に自動的にGitHub Pagesにデプロイされます。
 
 デプロイプロセス：
+
 1. mainブランチへコードをプッシュ
 2. GitHub Actionsが自動的にビルドを実行
 3. ビルド成果物がGitHub Pagesにデプロイされる
 
-**公開URL**: https://keigo-hisazumi.github.io/memo-list/
+**公開URL**: <https://keigo-hisazumi.github.io/memo-list/>
 
 **注意**: 初回デプロイ時は、GitHubリポジトリの設定でGitHub Pagesを有効にする必要があります：
+
 1. リポジトリの「Settings」→「Pages」を開く
 2. Sourceで「GitHub Actions」を選択
 
@@ -128,6 +134,7 @@ npm run cap:open:ios
 ```
 
 **必要な環境:**
+
 - macOS
 - Xcode 14以上
 - CocoaPods
@@ -146,12 +153,13 @@ npm run cap:open:android
 ```
 
 **必要な環境:**
+
 - Android Studio
 - Android SDK
 
 ## プロジェクト構成
 
-```
+```text
 src/
 ├── components/            # UI コンポーネント
 │   ├── HamburgerMenu.tsx  # メニュー（テーマ切り替え・ゴミ箱・ログアウト）
