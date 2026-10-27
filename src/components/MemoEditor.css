@@ -1,0 +1,39 @@
+/* memo-list 固有：エディタ下部のタグ入力欄 */
+.memo-editor {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  background: var(--app-bg);
+}
+
+.bottom-bar {
+  flex-shrink: 0;
+  border-top: 1px solid var(--app-border);
+  padding: 0.6rem 1.25rem calc(0.6rem + env(safe-area-inset-bottom, 0px));
+  background: var(--app-bg);
+}
+
+.tags-area {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.tag-icon {
+  color: var(--app-text-muted);
+  flex-shrink: 0;
+}
+
+.category-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 0.9rem;
+  color: var(--app-text-secondary);
+  background: transparent;
+}
+
+.category-input::placeholder {
+  color: var(--app-text-muted);
+}

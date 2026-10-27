@@ -6,19 +6,21 @@ import { ThemeProvider } from '@/contexts/ThemeContext'
 import LoginView from '@/views/LoginView'
 import MemoView from '@/views/MemoView'
 import TrashView from '@/views/TrashView'
+import SplashScreen from '@/shared/components/SplashScreen'
 
 const base = import.meta.env.BASE_URL
 
 function RequireAuth({ children }: { children: React.ReactNode }) {
   const { currentUser, isAuthReady } = useAuth()
-  if (!isAuthReady) return null
+  // 認証状態の確認が終わるまではスプラッシュ画面を表示する
+  if (!isAuthReady) return <SplashScreen appName="MemoList" />
   if (!currentUser) return <Navigate to="/login" replace />
   return <>{children}</>
 }
 
 function RequireGuest({ children }: { children: React.ReactNode }) {
   const { currentUser, isAuthReady } = useAuth()
-  if (!isAuthReady) return null
+  if (!isAuthReady) return <SplashScreen appName="MemoList" />
   if (currentUser) return <Navigate to="/" replace />
   return <>{children}</>
 }
