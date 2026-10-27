@@ -10,7 +10,7 @@
 - メモの作成・編集・削除
 - ゴミ箱（復元・完全削除・ゴミ箱を空にする）
 - ピン留め（ピン留めしたメモを一覧の先頭に表示）
-- カテゴリの設定とメモの検索
+- タグの設定とメモの検索（タイトル・本文・タグが対象）
 - 他の端末での編集をリアルタイムに反映
 - ライト / ダークテーマの切り替え（OS の設定に追従）
 - PWA 対応（スマートフォンのホーム画面に追加可能）
@@ -106,12 +106,12 @@ src/
   main.tsx          エントリーポイント
   App.tsx           ルーティング（ログイン必須ページの制御）
   firebase.ts       Firebase（Authentication / Firestore）の初期化
-  theme.ts          テーマの解決・適用（描画前に適用してちらつきを防止）
   views/            画面（ログイン / 新規登録・メイン画面・ゴミ箱）
-  components/       メモ一覧・メモ編集・メニュー（テーマ切り替え・ゴミ箱・ログアウト）
+  components/       メモ一覧・メモ編集・ドロワーメニューの項目
   contexts/         認証状態・メモの購読と CRUD・テーマの Context
   types/            メモの型定義
-  assets/           スタイル
+  shared/           markdown-editer と同一内容を保つ共通実装（見た目・テーマ・共通部品）
+  assets/           アプリ固有のスタイル
 public/             favicon と PWA 用アイコン
 firestore.rules     Firestore のセキュリティルール
 capacitor.config.ts Capacitor の設定

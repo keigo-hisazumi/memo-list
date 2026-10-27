@@ -1,0 +1,25 @@
+/* memo-list 固有：ピン留めアイコンとタグ */
+.pin-icon {
+  color: var(--app-accent);
+  flex-shrink: 0;
+  width: 16px;
+  margin-top: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.memo-tag {
+  flex-shrink: 0;
+  max-width: 40%;
+  padding: 0.1rem 0.45rem;
+  border-radius: 10px;
+  background: var(--app-tag-bg);
+  color: var(--app-tag-text);
+  font-size: 0.68rem;
+  font-weight: 600;
+  line-height: 1.4;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

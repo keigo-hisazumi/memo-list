@@ -1,9 +1,9 @@
-@import './base.css';
+@import '../shared/styles/base.css';
 
 a,
 .green {
   text-decoration: none;
-  color: #667eea;
+  color: var(--app-accent);
   transition: 0.4s;
   padding: 3px;
 }

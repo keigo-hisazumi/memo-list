@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react'
-import { resolveInitialTheme, applyThemeWithTransition } from '@/theme'
+import { resolveInitialTheme, saveTheme, watchSystemTheme } from '@/shared/theme'
 
 interface ThemeContextValue {
   isDark: boolean
@@ -13,25 +13,12 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   // これにより初期描画時のちらつき（FOUC）を防ぐ。
   const [isDark, setIsDark] = useState(resolveInitialTheme)
 
-  useEffect(() => {
-    const mq = window.matchMedia('(prefers-color-scheme: dark)')
-    function onSystemChange(e: MediaQueryListEvent) {
-      if (!localStorage.getItem('theme')) {
-        setIsDark(e.matches)
-        applyThemeWithTransition(e.matches)
-      }
-    }
-    mq.addEventListener('change', onSystemChange)
-    return () => mq.removeEventListener('change', onSystemChange)
-  }, [])
+  useEffect(() => watchSystemTheme(setIsDark), [])
 
   function toggleTheme() {
-    setIsDark(prev => {
-      const next = !prev
-      localStorage.setItem('theme', next ? 'dark' : 'light')
-      applyThemeWithTransition(next)
-      return next
-    })
+    const next = !isDark
+    setIsDark(next)
+    saveTheme(next)
   }
 
   return (
