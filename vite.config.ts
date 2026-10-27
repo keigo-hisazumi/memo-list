@@ -26,7 +26,7 @@ export default defineConfig({
         name: 'メモリスト - Memo List',
         short_name: 'メモリスト',
         description: 'シンプルで使いやすいメモアプリ',
-        theme_color: '#ffffff',
+        theme_color: '#eef2ff',
         background_color: '#ffffff',
         display: 'standalone',
         start_url: base,
