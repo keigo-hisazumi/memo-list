@@ -18,7 +18,10 @@
     "cap:add:android": "npx cap add android",
     "cap:sync": "npm run build && npx cap sync",
     "cap:open:ios": "npx cap open ios",
-    "cap:open:android": "npx cap open android"
+    "cap:open:android": "npx cap open android",
+    "icons": "pwa-assets-generator",
+    "prebuild": "npm run icons",
+    "predev": "npm run icons"
   },
   "dependencies": {
     "@capacitor/android": "^8.6.0",
@@ -36,6 +39,7 @@
     "@types/node": "^26.6.6",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
+    "@vite-pwa/assets-generator": "^2.0.0",
     "@vitejs/plugin-react": "^6.3.0",
     "eslint": "^10.14.0",
     "eslint-plugin-react-hooks": "^7.1.1",
